@@ -1,6 +1,32 @@
+import gzip
+import json
 import math
 import numpy as np
 import pandas as pd
+
+
+def parse(path):
+    g = gzip.open(path, 'rb')
+    for l in g:
+        yield json.loads(l)
+
+
+def getAmazonDF(path):
+    i = 0
+    df = {}
+    for d in parse(path):
+        df[i] = d
+        i += 1
+
+    df = pd.DataFrame.from_dict(df, orient='index')
+    df = df[df['unixReviewTime'] < 1406851200]  # remove the reviews
+    df = df.drop(
+        columns=["verified", "reviewTime", "reviewerID", "asin", "reviewerName", "summary", "unixReviewTime", "vote",
+                 "style", "image"])
+    df = df[df["overall"] != 3]
+    # df['overall'] = df.apply(lambda row: (row["overall"] > 3) * 2 - 1, axis=1)
+    df = df.fillna("")
+    return df
 
 
 def read_vader():
