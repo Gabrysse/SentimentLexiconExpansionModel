@@ -5,12 +5,19 @@ from matplotlib import pyplot as plt
 from dataset.Utilities import read_vader, read_glove
 from neural.net_softmax import NetSoftmax
 
-model = NetSoftmax(0, 0)
-model.load_state_dict(torch.load("net1.pth"))
-model.eval()
-
 vader = read_vader()
 glove = read_glove()
+
+scale_max = 0
+scale_min = 0
+for word in vader.keys():
+    if word in glove.keys():
+        scale_max = max(scale_max, vader[word])
+        scale_min = min(scale_min, vader[word])
+
+model = NetSoftmax(scale_min, scale_max)
+model.load_state_dict(torch.load("net1.pth"))
+model.eval()
 
 err = []
 for word in vader.keys():
@@ -21,6 +28,6 @@ for word in vader.keys():
 
 err = np.array(err)
 
-n_bins = 10
+n_bins = 20
 n, bins, patches = plt.hist(err, n_bins)
 plt.savefig('foo.png')
