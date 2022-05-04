@@ -4,13 +4,47 @@ import numpy as np
 import torch
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
+from scipy import stats
 
 from dataset.PolarityDataset import PolarityDataset
-from dataset.Utilities import read_vader, read_glove, dataPreparation
+from dataset.Utilities import read_vader, read_glove, dataPreparation, getAmazonDF
 from neural.net_softmax import NetSoftmax
 from neural.train import train
+from preprocessing import seed_regression, seed_filter
 
 nltk.download('punkt')
+
+
+def correlation_with_VADER(vader, seed, embeddings_index, net):
+    if vader is None:
+        vader = read_vader()
+
+    polarities_vader = []
+    polarities_seed = []
+    polarities_net = []
+    for token in vader.keys():
+        polarities_vader.append(vader[token])
+
+        try:
+            polarities_seed.append(seed[token])
+        except:
+            polarities_seed.append(0)
+
+        try:
+            polarities_net.append(net(torch.tensor(embeddings_index[token]).unsqueeze(dim=0)).detach().item())
+        except:
+            polarities_net.append(0)
+
+    polarities_vader = np.array(polarities_vader)
+    polarities_seed = np.array(polarities_seed)
+    polarities_net = np.array(polarities_net)
+
+    print(polarities_vader.shape)
+    print(polarities_seed.shape)
+    print(polarities_net.shape)
+
+    print(stats.pearsonr(polarities_vader, polarities_seed))
+    print(stats.pearsonr(polarities_vader, polarities_net))
 
 
 def main(params):
@@ -63,7 +97,6 @@ def main(params):
     test_dataloader = DataLoader(glove_dataset_test, batch_size=1, shuffle=True, num_workers=2)
 
     net = NetSoftmax(scale_min, scale_max)
-
     train(net, train_dataloader, eval_dataloader)
 
     # TEST
@@ -78,7 +111,40 @@ def main(params):
         except:
             pass
         print("\n")
+    #######################
 
+    # VALIDATION WITH VADER
+    print("\n\n DOMAIN SPECIFIC \n")
+
+    df0 = getAmazonDF('Musical_Instruments.json.gz')
+    vectorizer, regression = seed_regression(df0)
+    seed = seed_filter(df0, vectorizer, regression, frequency=500)
+    print(f"Seed length: {len(seed)}")
+    if embeddings_index is None:
+        embeddings_index = read_glove()
+
+    tokens, embeds, polarities, _ = dataPreparation(seed, embeddings_index)
+
+    train_tok, test_tok, train_emb, test_emb, train_pol, test_pol = train_test_split(tokens, embeds, polarities,
+                                                                                     test_size=0.2, shuffle=True)
+    train_tok, val_tok, train_emb, val_emb, train_pol, val_pol = train_test_split(train_tok, train_emb, train_pol,
+                                                                                  test_size=0.25, shuffle=True)
+
+    scale_max = np.max(polarities)
+    scale_min = np.min(polarities)
+
+    glove_dataset = PolarityDataset(train_emb, train_pol)
+    glove_dataset_eval = PolarityDataset(val_emb, val_pol)
+    glove_dataset_test = PolarityDataset(test_emb, test_pol)
+
+    train_dataloader = DataLoader(glove_dataset, batch_size=32, shuffle=True, num_workers=2, drop_last=True)
+    eval_dataloader = DataLoader(glove_dataset_eval, batch_size=1, shuffle=True, num_workers=2)
+    test_dataloader = DataLoader(glove_dataset_test, batch_size=1, shuffle=True, num_workers=2)
+
+    net = NetSoftmax(scale_min, scale_max)
+    train(net, train_dataloader, eval_dataloader)
+
+    correlation_with_VADER(vader, seed, embeddings_index, net)
     #######################
 
 

@@ -6,9 +6,6 @@ from torch.optim import Adam
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from neural.EarlyStopping import EarlyStopping
 
-#net = NetOld(scale_min, scale_max)
-# criterion = nn.L1Loss()
-
 
 def val(net, eval_dataloader, criterion):
     with torch.no_grad():
@@ -32,6 +29,7 @@ def get_lr(optimizer):
 
 
 def train(net, train_dataloader, eval_dataloader, epoch_num=150, batch_size=32):
+    # criterion = nn.L1Loss()
     criterion = nn.MSELoss()
     optimizer = Adam(net.parameters(), lr=0.001)
     scheduler = ReduceLROnPlateau(optimizer, 'min', patience=3, factor=0.5)
@@ -64,7 +62,7 @@ def train(net, train_dataloader, eval_dataloader, epoch_num=150, batch_size=32):
             running_loss += loss.item()
 
         val_loss = val(net, eval_dataloader, criterion)
-        print("Validation loss: ", val_loss)
+        print("\nValidation loss: ", val_loss)
         scheduler.step(val_loss)
 
         early_stopping(val_loss, net)
