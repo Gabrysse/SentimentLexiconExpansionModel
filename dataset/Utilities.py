@@ -14,6 +14,7 @@ def parse(path):
 def getAmazonDF(path):
     i = 0
     df = {}
+    print("Reading review dataset...")
     for d in parse(path):
         df[i] = d
         i += 1

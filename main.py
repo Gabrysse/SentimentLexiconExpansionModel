@@ -5,12 +5,15 @@ import torch
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
 from scipy import stats
+from tqdm import tqdm
+import time
+import os
 
 from dataset.PolarityDataset import PolarityDataset
 from dataset.Utilities import read_vader, read_glove, dataPreparation, getAmazonDF
 from neural.net_softmax import NetSoftmax
 from neural.train import train
-from preprocessing import seed_regression, seed_filter
+from preprocessing import seed_regression, seed_filter, tok
 
 nltk.download('punkt')
 
@@ -39,12 +42,44 @@ def correlation_with_VADER(vader, seed, embeddings_index, net):
     polarities_seed = np.array(polarities_seed)
     polarities_net = np.array(polarities_net)
 
-    print(polarities_vader.shape)
-    print(polarities_seed.shape)
-    print(polarities_net.shape)
+    # print(polarities_vader.shape)
+    # print(polarities_seed.shape)
+    # print(polarities_net.shape)
 
-    print(stats.pearsonr(polarities_vader, polarities_seed))
-    print(stats.pearsonr(polarities_vader, polarities_net))
+    print(f"Correlation SEED-VADER: {stats.pearsonr(polarities_vader, polarities_seed)[0]}")
+    print(f"Correlation NETPREDICTION-VADER: {stats.pearsonr(polarities_vader, polarities_net)[0]}")
+
+
+def unsupervised_review_sentiment(net, embeddings_index):
+    paths = ["aclImdb/test/neg", "aclImdb/test/pos"]
+
+    accuracy = 0
+    tot = 0
+    for i, path in enumerate(paths):
+        print(f"Current path -> {path}")
+        tot += len(os.listdir(path))
+        for f in tqdm(os.listdir(path), position=0, leave=True):
+            with open(os.path.join(path, f), 'r') as fp:
+                review = fp.read()
+            review_tok = tok(review)
+
+            prediction = 0
+            for word in review_tok:
+                try:
+                    prediction += net(torch.tensor(embeddings_index[word]).unsqueeze(dim=0)).detach().item()
+                except:
+                    pass
+
+            prediction_score = prediction / len(review_tok)
+
+            # print(prediction_score)
+
+            if (i == 0 and prediction_score < 0) or (i == 1 and prediction_score > 0):
+                accuracy += 1
+
+    accuracy = accuracy / tot
+
+    return accuracy
 
 
 def main(params):
@@ -96,17 +131,18 @@ def main(params):
     eval_dataloader = DataLoader(glove_dataset_eval, batch_size=1, shuffle=True, num_workers=2)
     test_dataloader = DataLoader(glove_dataset_test, batch_size=1, shuffle=True, num_workers=2)
 
-    net = NetSoftmax(scale_min, scale_max)
-    train(net, train_dataloader, eval_dataloader)
+    net1 = NetSoftmax(scale_min, scale_max)
+    train(net1, train_dataloader, eval_dataloader)
+    torch.save(net1.state_dict(), "net1.pth")
 
     # TEST
     words = ["like", "love", "amazing", "excellent", "terrible", "awful", "ugly", "complaint"]
 
-    net.eval()
+    net1.eval()
 
     for word in words:
         try:
-            print("Predicted", word, net(torch.tensor(embeddings_index[word]).unsqueeze(dim=0)).detach().item())
+            print("Predicted", word, net1(torch.tensor(embeddings_index[word]).unsqueeze(dim=0)).detach().item())
             print("Ground truth", word, vader[word])
         except:
             pass
@@ -114,7 +150,7 @@ def main(params):
     #######################
 
     # VALIDATION WITH VADER
-    print("\n\n DOMAIN SPECIFIC \n")
+    print("\nDOMAIN SPECIFIC \n")
 
     df0 = getAmazonDF('Musical_Instruments.json.gz')
     vectorizer, regression = seed_regression(df0)
@@ -141,11 +177,21 @@ def main(params):
     eval_dataloader = DataLoader(glove_dataset_eval, batch_size=1, shuffle=True, num_workers=2)
     test_dataloader = DataLoader(glove_dataset_test, batch_size=1, shuffle=True, num_workers=2)
 
-    net = NetSoftmax(scale_min, scale_max)
-    train(net, train_dataloader, eval_dataloader)
+    net2 = NetSoftmax(scale_min, scale_max)
+    train(net2, train_dataloader, eval_dataloader)
+    torch.save(net1.state_dict(), "net2.pth")
 
-    correlation_with_VADER(vader, seed, embeddings_index, net)
+    correlation_with_VADER(vader, seed, embeddings_index, net2)
     #######################
+
+    # print("\n Unsupervised Review Sentiment Classification")
+    #
+    # glove_vader_baseline = unsupervised_review_sentiment(net1, embeddings_index)
+    # glove_seed_accuracy = unsupervised_review_sentiment(net1, embeddings_index)
+    #
+    # print(f"Glove-Vader BASELINE: {glove_vader_baseline}")
+    # print(f"Glove-Seed ACCURACY: {glove_seed_accuracy}")
+
 
 
 if __name__ == '__main__':
