@@ -4,7 +4,6 @@ from matplotlib import pyplot as plt
 
 from dataset.Utilities import read_vader, read_glove
 from neural.net_softmax import NetSoftmax
-%matplotlib inline
 
 model = NetSoftmax(0, 0)
 model.load_state_dict(torch.load("net1.pth"))
@@ -24,4 +23,4 @@ err = np.array(err)
 
 n_bins = 10
 n, bins, patches = plt.hist(err, n_bins)
-plt.show()
+plt.savefig('foo.png')
