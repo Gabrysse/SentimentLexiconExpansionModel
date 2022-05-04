@@ -44,7 +44,7 @@ class NetSoftmax(nn.Module):
         x = self.fc3(x)
         x = self.fc4(x)
 
-        x = x * (self.scale_max-self.scale_min) + self.scale_min
+        x = x * (self.scale_max - self.scale_min) + self.scale_min
 
         x = self.output(x)
 
