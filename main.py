@@ -136,7 +136,7 @@ def main(params):
     checkpoint = {
         'scale_max': scale_max,
         'scale_min': scale_min,
-        'model_state_dict': net1.module.state_dict()
+        'model_state_dict': net1.state_dict()
     }
     torch.save(checkpoint, "net1.pth")
 
@@ -201,7 +201,6 @@ def main(params):
     #
     # print(f"Glove-Vader BASELINE: {glove_vader_baseline}")
     # print(f"Glove-Seed ACCURACY: {glove_seed_accuracy}")
-
 
 
 if __name__ == '__main__':
