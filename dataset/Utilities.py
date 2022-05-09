@@ -11,7 +11,8 @@ def parse(path):
         yield json.loads(l)
 
 
-def getAmazonDF(path):
+#1406851200 August 1st 2014
+def getAmazonDF(path, start_timestamp=0, end_timestamp=1406851200):
     i = 0
     df = {}
     print("Reading review dataset...")
@@ -20,7 +21,8 @@ def getAmazonDF(path):
         i += 1
 
     df = pd.DataFrame.from_dict(df, orient='index')
-    df = df[df['unixReviewTime'] < 1406851200]  # remove the reviews
+    df = df[df['unixReviewTime'] < end_timestamp]  # remove the reviews
+    df = df[df['unixReviewTime'] > start_timestamp]  # remove the reviews
     df = df.drop(
         columns=["verified", "reviewTime", "reviewerID", "asin", "reviewerName", "summary", "unixReviewTime", "vote",
                  "style", "image"])

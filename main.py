@@ -15,8 +15,6 @@ from neural.net_softmax import NetSoftmax
 from neural.train import train
 from preprocessing import seed_regression, seed_filter, tok
 
-nltk.download('punkt')
-
 
 def correlation_with_VADER(vader, seed, embeddings_index, net):
     if vader is None:
@@ -102,6 +100,8 @@ def main(params):
     parser.add_argument('--loss', type=str, default='dice', help='loss function, dice or crossentropy')
 
     args = parser.parse_args(params)
+
+    nltk.download('punkt')
 
     # VALIDATION WITH VADER
     vader = read_vader()
