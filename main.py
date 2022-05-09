@@ -187,7 +187,7 @@ def main(params):
     checkpoint = {
         'scale_max': scale_max,
         'scale_min': scale_min,
-        'model_state_dict': net1.module.state_dict()
+        'model_state_dict': net2.state_dict()
     }
     torch.save(checkpoint, "net2.pth")
 

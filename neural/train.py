@@ -48,10 +48,10 @@ def train(net, train_dataloader, eval_dataloader, epoch_num=150, batch_size=32):
 
             optimizer.zero_grad()
 
-            outputs = net(inputs).squeeze()
+            outputs = net(inputs)
             # print(outputs.shape)
             # print(labels.shape)
-            loss = criterion(outputs, labels)
+            loss = criterion(outputs.squeeze(), labels.squeeze())
 
             tq.update(batch_size)
             tq.set_postfix(loss='%.6f' % loss)
