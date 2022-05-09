@@ -17,7 +17,7 @@ for word in vader.keys():
 
 loaded_checkpoint = torch.load("net1.pth")
 model = NetSoftmax(loaded_checkpoint['scale_min'], loaded_checkpoint['scale_max'])
-model.module.load_state_dict(loaded_checkpoint['model_state_dict'])
+model.load_state_dict(loaded_checkpoint['model_state_dict'])
 model.eval()
 
 err = []
