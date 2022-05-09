@@ -133,7 +133,12 @@ def main(params):
 
     net1 = NetSoftmax(scale_min, scale_max)
     train(net1, train_dataloader, eval_dataloader)
-    torch.save(net1.state_dict(), "net1.pth")
+    checkpoint = {
+        'scale_max': scale_max,
+        'scale_min': scale_min,
+        'model_state_dict': net1.module.state_dict()
+    }
+    torch.save(checkpoint, "net1.pth")
 
     # TEST
     words = ["like", "love", "amazing", "excellent", "terrible", "awful", "ugly", "complaint"]
@@ -179,7 +184,12 @@ def main(params):
 
     net2 = NetSoftmax(scale_min, scale_max)
     train(net2, train_dataloader, eval_dataloader)
-    torch.save(net1.state_dict(), "net2.pth")
+    checkpoint = {
+        'scale_max': scale_max,
+        'scale_min': scale_min,
+        'model_state_dict': net1.module.state_dict()
+    }
+    torch.save(checkpoint, "net2.pth")
 
     correlation_with_VADER(vader, seed, embeddings_index, net2)
     #######################

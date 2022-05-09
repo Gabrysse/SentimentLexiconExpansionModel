@@ -15,8 +15,9 @@ for word in vader.keys():
         scale_max = max(scale_max, vader[word])
         scale_min = min(scale_min, vader[word])
 
-model = NetSoftmax(scale_min, scale_max)
-model.load_state_dict(torch.load("net1.pth"))
+loaded_checkpoint = torch.load("net1.pth")
+model = NetSoftmax(loaded_checkpoint['scale_min'], loaded_checkpoint['scale_max'])
+model.module.load_state_dict(loaded_checkpoint['model_state_dict'])
 model.eval()
 
 err = []
@@ -30,4 +31,4 @@ err = np.array(err)
 
 n_bins = 20
 n, bins, patches = plt.hist(err, n_bins)
-plt.savefig('foo.png')
+plt.savefig('exp1.png')
