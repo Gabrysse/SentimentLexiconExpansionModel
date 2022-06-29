@@ -13,11 +13,14 @@ def tok(doc):
 
 
 def seed_regression(dataframe):
+    print("Seed regression...")
     vectorizer = CountVectorizer(tokenizer=tok, min_df=25)
     #   vectorizer = TfidfVectorizer(tokenizer=tok, use_idf=False, min_df=50)
 
     # regression = Ridge()
-    svm = LinearSVC(random_state=0, tol=1e-4, fit_intercept=False)
+    w_negative = len(dataframe['overall'][dataframe['overall'] == +1]) / len(dataframe['overall'])
+    w_positive = 1 - w_negative
+    svm = LinearSVC(random_state=0, tol=1e-4, fit_intercept=False, class_weight={-1: w_negative, 1: w_positive})
 
     pipe = Pipeline([
         ('cv', vectorizer),
