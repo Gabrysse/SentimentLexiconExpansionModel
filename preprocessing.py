@@ -17,7 +17,7 @@ def seed_regression(dataframe):
     #   vectorizer = TfidfVectorizer(tokenizer=tok, use_idf=False, min_df=50)
 
     # regression = Ridge()
-    svm = LinearSVC(random_state=0, tol=1e-4)
+    svm = LinearSVC(random_state=0, tol=1e-4, fit_intercept=False)
 
     pipe = Pipeline([
         ('cv', vectorizer),
