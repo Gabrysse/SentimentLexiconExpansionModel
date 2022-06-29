@@ -104,54 +104,54 @@ def main(params):
     args = parser.parse_args(params)
 
     # VALIDATION WITH VADER
-    vader = read_vader()
-    embeddings_index = read_glove()
-
-    tokens, embeds, polarities, bucket = dataPreparation(vader, embeddings_index)
-
-    train_tok, test_tok, train_emb, test_emb, train_pol, test_pol, train_bck, test_bck = train_test_split(tokens,
-                                                                                                          embeds,
-                                                                                                          polarities,
-                                                                                                          bucket,
-                                                                                                          test_size=0.2,
-                                                                                                          stratify=bucket,
-                                                                                                          shuffle=True)
-    train_tok, val_tok, train_emb, val_emb, train_pol, val_pol = train_test_split(train_tok, train_emb, train_pol,
-                                                                                  test_size=0.25, stratify=train_bck,
-                                                                                  shuffle=True)
-
-    scale_max = np.max(polarities)
-    scale_min = np.min(polarities)
-
-    glove_dataset = PolarityDataset(train_emb, train_pol)
-    glove_dataset_eval = PolarityDataset(val_emb, val_pol)
-    glove_dataset_test = PolarityDataset(test_emb, test_pol)
-
-    train_dataloader = DataLoader(glove_dataset, batch_size=32, shuffle=True, num_workers=2, drop_last=True)
-    eval_dataloader = DataLoader(glove_dataset_eval, batch_size=1, shuffle=True, num_workers=2)
-    test_dataloader = DataLoader(glove_dataset_test, batch_size=1, shuffle=True, num_workers=2)
-
-    net1 = NetSoftmax(scale_min, scale_max)
-    train(net1, train_dataloader, eval_dataloader)
-    checkpoint = {
-        'scale_max': scale_max,
-        'scale_min': scale_min,
-        'model_state_dict': net1.state_dict()
-    }
-    torch.save(checkpoint, "net1.pth")
-
-    # TEST
-    words = ["like", "love", "amazing", "excellent", "terrible", "awful", "ugly", "complaint"]
-
-    net1.eval()
-
-    for word in words:
-        try:
-            print("Predicted", word, net1(torch.tensor(embeddings_index[word]).unsqueeze(dim=0)).detach().item())
-            print("Ground truth", word, vader[word])
-        except:
-            pass
-        print("\n")
+    # vader = read_vader()
+    # embeddings_index = read_glove()
+    #
+    # tokens, embeds, polarities, bucket = dataPreparation(vader, embeddings_index)
+    #
+    # train_tok, test_tok, train_emb, test_emb, train_pol, test_pol, train_bck, test_bck = train_test_split(tokens,
+    #                                                                                                       embeds,
+    #                                                                                                       polarities,
+    #                                                                                                       bucket,
+    #                                                                                                       test_size=0.2,
+    #                                                                                                       stratify=bucket,
+    #                                                                                                       shuffle=True)
+    # train_tok, val_tok, train_emb, val_emb, train_pol, val_pol = train_test_split(train_tok, train_emb, train_pol,
+    #                                                                               test_size=0.25, stratify=train_bck,
+    #                                                                               shuffle=True)
+    #
+    # scale_max = np.max(polarities)
+    # scale_min = np.min(polarities)
+    #
+    # glove_dataset = PolarityDataset(train_emb, train_pol)
+    # glove_dataset_eval = PolarityDataset(val_emb, val_pol)
+    # glove_dataset_test = PolarityDataset(test_emb, test_pol)
+    #
+    # train_dataloader = DataLoader(glove_dataset, batch_size=32, shuffle=True, num_workers=2, drop_last=True)
+    # eval_dataloader = DataLoader(glove_dataset_eval, batch_size=1, shuffle=True, num_workers=2)
+    # test_dataloader = DataLoader(glove_dataset_test, batch_size=1, shuffle=True, num_workers=2)
+    #
+    # net1 = NetSoftmax(scale_min, scale_max)
+    # train(net1, train_dataloader, eval_dataloader)
+    # checkpoint = {
+    #     'scale_max': scale_max,
+    #     'scale_min': scale_min,
+    #     'model_state_dict': net1.state_dict()
+    # }
+    # torch.save(checkpoint, "net1.pth")
+    #
+    # # TEST
+    # words = ["like", "love", "amazing", "excellent", "terrible", "awful", "ugly", "complaint"]
+    #
+    # net1.eval()
+    #
+    # for word in words:
+    #     try:
+    #         print("Predicted", word, net1(torch.tensor(embeddings_index[word]).unsqueeze(dim=0)).detach().item())
+    #         print("Ground truth", word, vader[word])
+    #     except:
+    #         pass
+    #     print("\n")
     #######################
 
     # VALIDATION WITH VADER
