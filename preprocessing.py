@@ -20,7 +20,7 @@ def seed_regression(dataframe):
     # regression = Ridge()
     w_negative = len(dataframe['overall'][dataframe['overall'] == +1]) / len(dataframe['overall'])
     w_positive = 1 - w_negative
-    svm = LinearSVC(random_state=0, dual=False, fit_intercept=False, class_weight={-1: w_negative, 1: w_positive})
+    svm = LinearSVC(random_state=0, fit_intercept=False, class_weight={-1: w_negative, 1: w_positive}, max_iter=5000)
 
     pipe = Pipeline([
         ('cv', vectorizer),
