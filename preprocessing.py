@@ -3,6 +3,7 @@ from nltk import RegexpTokenizer
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import Ridge
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.svm import LinearSVC
 
 tokNot = RegexpTokenizer(r'not \w+|\w+')
 
@@ -15,15 +16,16 @@ def seed_regression(dataframe):
     vectorizer = CountVectorizer(tokenizer=tok, min_df=25)
     #   vectorizer = TfidfVectorizer(tokenizer=tok, use_idf=False, min_df=50)
 
-    regression = Ridge()
+    # regression = Ridge()
+    svm = LinearSVC(random_state=0, tol=1e-4)
 
     pipe = Pipeline([
         ('cv', vectorizer),
-        ('lr', regression)
+        ('lr', svm)
     ])
 
     pipe.fit(dataframe.reviewText, dataframe.overall)
-    return vectorizer, regression
+    return vectorizer, svm
 
 
 def seed_filter(dataframe, vectorizer, regression, frequency=500):

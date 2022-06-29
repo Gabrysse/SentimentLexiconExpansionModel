@@ -25,7 +25,7 @@ def getAmazonDF(path):
         columns=["verified", "reviewTime", "reviewerID", "asin", "reviewerName", "summary", "unixReviewTime", "vote",
                  "style", "image"])
     df = df[df["overall"] != 3]
-    # df['overall'] = df.apply(lambda row: (row["overall"] > 3) * 2 - 1, axis=1)
+    df['overall'] = df.apply(lambda row: (row["overall"] > 3) * 2 - 1, axis=1)
     df = df.fillna("")
     return df
 
