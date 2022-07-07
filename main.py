@@ -157,7 +157,6 @@ def main(params):
     # VALIDATION WITH VADER
     print("\nDOMAIN SPECIFIC \n")
 
-
     df0 = getAmazonDF('Musical_Instruments.json.gz')
     vectorizer, regression = seed_regression(df0)
     seed = seed_filter(df0, vectorizer, regression, frequency=500)

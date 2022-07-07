@@ -17,18 +17,18 @@ def seed_regression(dataframe):
     vectorizer = CountVectorizer(tokenizer=tok, min_df=25)
     #   vectorizer = TfidfVectorizer(tokenizer=tok, use_idf=False, min_df=50)
 
-    # regression = Ridge()
-    w_negative = len(dataframe['overall'][dataframe['overall'] == +1]) / len(dataframe['overall'])
-    w_positive = 1 - w_negative
-    svm = LinearSVC(random_state=0, fit_intercept=False, class_weight={-1: w_negative, 1: w_positive}, max_iter=5000)
+    regression = Ridge()
+    # w_negative = len(dataframe['overall'][dataframe['overall'] == +1]) / len(dataframe['overall'])
+    # w_positive = 1 - w_negative
+    # svm = LinearSVC(random_state=0, fit_intercept=False, class_weight={-1: w_negative, 1: w_positive}, max_iter=5000)
 
     pipe = Pipeline([
         ('cv', vectorizer),
-        ('lr', svm)
+        ('lr', regression)
     ])
 
     pipe.fit(dataframe.reviewText, dataframe.overall)
-    return vectorizer, svm
+    return vectorizer, regression
 
 
 def seed_filter(dataframe, vectorizer, regression, frequency=500):
