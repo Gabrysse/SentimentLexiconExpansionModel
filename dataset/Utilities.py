@@ -12,18 +12,24 @@ def parse(path):
 
 
 def getAmazonDF(path):
-    i = 0
-    df = {}
     print("Reading review dataset...")
-    for d in parse(path):
-        df[i] = d
-        i += 1
+    review_dict = {}
+    # i = 0
+    # for d in parse(path):
+    #     review_dict[i] = d
+    #     i += 1
 
-    df = pd.DataFrame.from_dict(df, orient='index')
-    df = df[df['unixReviewTime'] < 1406851200]  # remove the reviews
-    df = df.drop(
-        columns=["verified", "reviewTime", "reviewerID", "asin", "reviewerName", "summary", "unixReviewTime", "vote",
-                 "style", "image"])
+    for i, line in enumerate(gzip.open('Movies_and_TV.json.gz', 'rb')):
+        review = json.loads(line)
+        if 'reviewText' in review and 'overall' in review:
+            if review['unixReviewTime'] < 1406851200:
+                review_dict[i] = {'overall': review['overall'], 'reviewText': review['reviewText']}
+
+    df = pd.DataFrame.from_dict(review_dict, orient='index')
+    # df = df[df['unixReviewTime'] < 1406851200]  # remove the reviews
+    # df = df.drop(
+    #     columns=["verified", "reviewTime", "reviewerID", "asin", "reviewerName", "summary", "unixReviewTime", "vote",
+    #              "style", "image"])
     df = df[df["overall"] != 3]
     df['overall'] = df.apply(lambda row: (row["overall"] > 3) * 2 - 1, axis=1)
     df = df.fillna("")
