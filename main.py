@@ -83,9 +83,12 @@ def unsupervised_review_sentiment(net, embeddings_index):
 
 
 def main(args):
+    vader = None
+    embeddings_index = None
+
     # VALIDATION WITH VADER
-    vader = read_vader()
-    embeddings_index = read_glove()
+    # vader = read_vader()
+    # embeddings_index = read_glove()
     #
     # tokens, embeds, polarities, bucket = dataPreparation(vader, embeddings_index)
     #

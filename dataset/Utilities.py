@@ -12,7 +12,7 @@ def parse(path):
 
 
 def getAmazonDF(path, filter_year=True):
-    print("Reading review dataset...")
+    print(f"Reading review dataset [{path}, {filter_year}]...")
     review_dict = {}
     # i = 0
     # for d in parse(path):
