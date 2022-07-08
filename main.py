@@ -82,29 +82,7 @@ def unsupervised_review_sentiment(net, embeddings_index):
     return accuracy
 
 
-def main(params):
-    # basic parameters
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', type=str, default="CamVid", help='Review dataset you are using.')
-    parser.add_argument('--filter_year', action='store_true', help='Add this if you want to filter the review >2014')
-
-    parser.add_argument('--num_epochs', type=int, default=300, help='Number of epochs to train for')
-    parser.add_argument('--epoch_start_i', type=int, default=0, help='Start counting epochs from this number')
-    parser.add_argument('--checkpoint_step', type=int, default=100, help='How often to save checkpoints (epochs)')
-    parser.add_argument('--validation_step', type=int, default=10, help='How often to perform validation (epochs)')
-    parser.add_argument('--batch_size', type=int, default=1, help='Number of images in each batch')
-    parser.add_argument('--learning_rate', type=float, default=0.01, help='learning rate used for train')
-    parser.add_argument('--data', type=str, default='', help='path of training data')
-    parser.add_argument('--num_workers', type=int, default=4, help='num of workers')
-    parser.add_argument('--cuda', type=str, default='0', help='GPU ids used for training')
-    parser.add_argument('--use_gpu', type=bool, default=True, help='whether to user gpu for training')
-    parser.add_argument('--pretrained_model_path', type=str, default=None, help='path to pretrained model')
-    parser.add_argument('--save_model_path', type=str, default=None, help='path to save model')
-    parser.add_argument('--optimizer', type=str, default='rmsprop', help='optimizer, support rmsprop, sgd, adam')
-    parser.add_argument('--loss', type=str, default='dice', help='loss function, dice or crossentropy')
-
-    args = parser.parse_args(params)
-
+def main(args):
     # VALIDATION WITH VADER
     vader = read_vader()
     embeddings_index = read_glove()
@@ -159,7 +137,7 @@ def main(params):
     # VALIDATION WITH VADER
     print("\nDOMAIN SPECIFIC \n")
 
-    df0 = getAmazonDF('Musical_Instruments.json.gz')
+    df0 = getAmazonDF(args.dataset, args.filter_year)
     vectorizer, regression = seed_regression(df0)
     seed = seed_filter(df0, vectorizer, regression, frequency=500)
     print(f"Seed length: {len(seed)}")
@@ -206,13 +184,34 @@ def main(params):
 
 
 if __name__ == '__main__':
-    params = [
-        '--num_epochs', '100',
-        '--learning_rate', '2.5e-2',
-        '--data', '../datasets/CamVid/',
-        '--num_workers', '8',
-        '--batch_size', '4',
-        '--optimizer', 'sgd',
-        '--checkpoint_step', '2'
-    ]
-    main(params)
+    # params = [
+    #     '--num_epochs', '100',
+    #     '--learning_rate', '2.5e-2',
+    #     '--data', '../datasets/CamVid/',
+    #     '--num_workers', '8',
+    #     '--batch_size', '4',
+    #     '--optimizer', 'sgd',
+    #     '--checkpoint_step', '2'
+    # ]
+    # basic parameters
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--dataset', type=str, default="CamVid", help='Review dataset you are using.')
+    parser.add_argument('--filter_year', action='store_true', default=True, help='Consider only the review < July 2014')
+
+    parser.add_argument('--num_epochs', type=int, default=300, help='Number of epochs to train for')
+    parser.add_argument('--epoch_start_i', type=int, default=0, help='Start counting epochs from this number')
+    parser.add_argument('--checkpoint_step', type=int, default=100, help='How often to save checkpoints (epochs)')
+    parser.add_argument('--validation_step', type=int, default=10, help='How often to perform validation (epochs)')
+    parser.add_argument('--batch_size', type=int, default=1, help='Number of images in each batch')
+    parser.add_argument('--learning_rate', type=float, default=0.01, help='learning rate used for train')
+    parser.add_argument('--data', type=str, default='', help='path of training data')
+    parser.add_argument('--num_workers', type=int, default=4, help='num of workers')
+    parser.add_argument('--cuda', type=str, default='0', help='GPU ids used for training')
+    parser.add_argument('--use_gpu', type=bool, default=True, help='whether to user gpu for training')
+    parser.add_argument('--pretrained_model_path', type=str, default=None, help='path to pretrained model')
+    parser.add_argument('--save_model_path', type=str, default=None, help='path to save model')
+    parser.add_argument('--optimizer', type=str, default='rmsprop', help='optimizer, support rmsprop, sgd, adam')
+    parser.add_argument('--loss', type=str, default='dice', help='loss function, dice or crossentropy')
+
+    args = parser.parse_args()
+    main(args)
