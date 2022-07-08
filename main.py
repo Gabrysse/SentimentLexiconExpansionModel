@@ -13,7 +13,7 @@ from dataset.PolarityDataset import PolarityDataset
 from dataset.Utilities import read_vader, read_glove, dataPreparation, getAmazonDF
 from neural.net_softmax import NetSoftmax
 from neural.train import train
-from preprocessing import seed_regression, seed_filter, tok
+from preprocessing import seed_regression, seed_filter, tok, get_token_counts, train_linear_model, seed_filter2
 
 nltk.download('punkt')
 
@@ -138,8 +138,13 @@ def main(args):
     print("\nDOMAIN SPECIFIC \n")
 
     df0 = getAmazonDF(args.dataset, args.filter_year)
-    vectorizer, regression = seed_regression(df0)
-    seed = seed_filter(df0, vectorizer, regression, frequency=500)
+    # vectorizer, regression = seed_regression(df0)
+    # seed = seed_filter(df0, vectorizer, regression, frequency=500)
+
+    X, features_list = get_token_counts(df0.reviewText)
+    coeff = train_linear_model(X, df0.overall)
+    seed = seed_filter2(X, features_list, coeff, frequency=500)
+
     print(f"Seed length: {len(seed)}")
     if embeddings_index is None:
         embeddings_index = read_glove()
@@ -196,7 +201,7 @@ if __name__ == '__main__':
     # basic parameters
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', type=str, default="CamVid", help='Review dataset you are using.')
-    parser.add_argument('--filter_year', action='store_true', default=True, help='Consider only the review < July 2014')
+    parser.add_argument('--filter_year', action='store_true', help='Consider only the review < July 2014')
 
     parser.add_argument('--num_epochs', type=int, default=300, help='Number of epochs to train for')
     parser.add_argument('--epoch_start_i', type=int, default=0, help='Start counting epochs from this number')

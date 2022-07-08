@@ -12,6 +12,25 @@ def tok(doc):
     return tokNot.tokenize(doc.lower().replace("n't", " not"))
 
 
+def get_token_counts(reviews):
+    vectorizer = CountVectorizer(tokenizer=tok, min_df=25)
+    X = vectorizer.fit_transform(reviews)
+    return X, vectorizer.get_feature_names_out()
+
+
+def train_linear_model(X, y):
+    regression = Ridge()
+    regression.fit(X, y)
+    return regression.coef_
+
+
+def seed_filter2(X, features, coeff, frequency=500):
+    mask = np.array(X.sum(axis=0) > frequency).squeeze()
+    tokens = features[mask]
+    coefs = coeff[mask]
+    return dict(zip(tokens, coefs))
+
+
 def seed_regression(dataframe):
     print("Seed regression...")
     vectorizer = CountVectorizer(tokenizer=tok, min_df=25)
