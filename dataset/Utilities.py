@@ -11,7 +11,7 @@ def parse(path):
         yield json.loads(l)
 
 
-def getAmazonDF(path):
+def getAmazonDF(path, filter_year=True):
     print("Reading review dataset...")
     review_dict = {}
     # i = 0
@@ -19,10 +19,13 @@ def getAmazonDF(path):
     #     review_dict[i] = d
     #     i += 1
 
-    for i, line in enumerate(gzip.open('Movies_and_TV.json.gz', 'rb')):
+    for i, line in enumerate(gzip.open(path, 'rb')):
         review = json.loads(line)
         if 'reviewText' in review and 'overall' in review:
-            if review['unixReviewTime'] < 1406851200:
+            if filter_year:
+                if review['unixReviewTime'] < 1406851200:
+                    review_dict[i] = {'overall': review['overall'], 'reviewText': review['reviewText']}
+            else:
                 review_dict[i] = {'overall': review['overall'], 'reviewText': review['reviewText']}
 
     df = pd.DataFrame.from_dict(review_dict, orient='index')

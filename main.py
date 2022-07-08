@@ -85,11 +85,13 @@ def unsupervised_review_sentiment(net, embeddings_index):
 def main(params):
     # basic parameters
     parser = argparse.ArgumentParser()
+    parser.add_argument('--dataset', type=str, default="CamVid", help='Review dataset you are using.')
+    parser.add_argument('--filter_year', action='store_true', help='Add this if you want to filter the review >2014')
+
     parser.add_argument('--num_epochs', type=int, default=300, help='Number of epochs to train for')
     parser.add_argument('--epoch_start_i', type=int, default=0, help='Start counting epochs from this number')
     parser.add_argument('--checkpoint_step', type=int, default=100, help='How often to save checkpoints (epochs)')
     parser.add_argument('--validation_step', type=int, default=10, help='How often to perform validation (epochs)')
-    parser.add_argument('--dataset', type=str, default="CamVid", help='Dataset you are using.')
     parser.add_argument('--batch_size', type=int, default=1, help='Number of images in each batch')
     parser.add_argument('--learning_rate', type=float, default=0.01, help='learning rate used for train')
     parser.add_argument('--data', type=str, default='', help='path of training data')
@@ -104,8 +106,8 @@ def main(params):
     args = parser.parse_args(params)
 
     # VALIDATION WITH VADER
-    # vader = read_vader()
-    # embeddings_index = read_glove()
+    vader = read_vader()
+    embeddings_index = read_glove()
     #
     # tokens, embeds, polarities, bucket = dataPreparation(vader, embeddings_index)
     #
