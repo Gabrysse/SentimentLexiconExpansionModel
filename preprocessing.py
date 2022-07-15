@@ -1,15 +1,33 @@
 import numpy as np
+import re
 from nltk import RegexpTokenizer
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import Ridge
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.svm import LinearSVC
+import spacy
 
 tokNot = RegexpTokenizer(r'not \w+|\w+')
+nlp = spacy.load("en_core_web_sm")
 
 
 def tok(doc):
-    return tokNot.tokenize(doc.lower().replace("n't", " not"))
+    punctuations = '''!()-[]{};:'",<>./?@#$%^&*_~'''
+
+    nlp.add_pipe("merge_entities")
+    doc2 = nlp(doc)
+
+    with doc2.retokenize() as retokenizer:
+        for i, token in enumerate(doc2):
+            if token.lemma_ == 'not':
+                retokenizer.merge(doc2[i:i + 2])
+
+    token_list1 = [token.text for token in doc2 if token.text not in punctuations]
+    token_list2 = [token.lemma_ for token in doc2 if token.text not in punctuations]
+    print(token_list1)
+    print(token_list2)
+
+    return token_list2
 
 
 def get_token_counts(reviews):
