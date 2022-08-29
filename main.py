@@ -18,10 +18,7 @@ from preprocessing import seed_regression, seed_filter, tok, get_token_counts, t
 nltk.download('punkt')
 
 
-def correlation_with_VADER(vader, seed, embeddings_index, net):
-    if vader is None:
-        vader = read_vader()
-
+def correlation_with_VADER(seed, vader, embeddings_index, net):
     polarities_vader = []
     polarities_seed = []
     polarities_net = []
@@ -82,76 +79,45 @@ def unsupervised_review_sentiment(net, embeddings_index):
     return accuracy
 
 
-def main(args):
-    vader = None
-    embeddings_index = None
-
+def domain_generic(vader, embeddings_index):
     # VALIDATION WITH VADER
-    # vader = read_vader()
-    # embeddings_index = read_glove()
-    #
-    # tokens, embeds, polarities, bucket = dataPreparation(vader, embeddings_index)
-    #
-    # train_tok, test_tok, train_emb, test_emb, train_pol, test_pol, train_bck, test_bck = train_test_split(tokens,
-    #                                                                                                       embeds,
-    #                                                                                                       polarities,
-    #                                                                                                       bucket,
-    #                                                                                                       test_size=0.2,
-    #                                                                                                       stratify=bucket,
-    #                                                                                                       shuffle=True)
-    # train_tok, val_tok, train_emb, val_emb, train_pol, val_pol = train_test_split(train_tok, train_emb, train_pol,
-    #                                                                               test_size=0.25, stratify=train_bck,
-    #                                                                               shuffle=True)
-    #
-    # scale_max = np.max(polarities)
-    # scale_min = np.min(polarities)
-    #
-    # glove_dataset = PolarityDataset(train_emb, train_pol)
-    # glove_dataset_eval = PolarityDataset(val_emb, val_pol)
-    # glove_dataset_test = PolarityDataset(test_emb, test_pol)
-    #
-    # train_dataloader = DataLoader(glove_dataset, batch_size=32, shuffle=True, num_workers=2, drop_last=True)
-    # eval_dataloader = DataLoader(glove_dataset_eval, batch_size=1, shuffle=True, num_workers=2)
-    # test_dataloader = DataLoader(glove_dataset_test, batch_size=1, shuffle=True, num_workers=2)
-    #
-    # net1 = NetSoftmax(scale_min, scale_max)
-    # train(net1, train_dataloader, eval_dataloader)
-    # checkpoint = {
-    #     'scale_max': scale_max,
-    #     'scale_min': scale_min,
-    #     'model_state_dict': net1.state_dict()
-    # }
-    # torch.save(checkpoint, "net1.pth")
-    #
-    # # TEST
-    # words = ["like", "love", "amazing", "excellent", "terrible", "awful", "ugly", "complaint"]
-    #
-    # net1.eval()
-    #
-    # for word in words:
-    #     try:
-    #         print("Predicted", word, net1(torch.tensor(embeddings_index[word]).unsqueeze(dim=0)).detach().item())
-    #         print("Ground truth", word, vader[word])
-    #     except:
-    #         pass
-    #     print("\n")
-    #######################
+    tokens, embeds, polarities, bucket = dataPreparation(vader, embeddings_index)
 
-    # VALIDATION WITH VADER
-    print("\nDOMAIN SPECIFIC \n")
+    train_tok, test_tok, train_emb, test_emb, train_pol, test_pol, train_bck, test_bck = train_test_split(tokens,
+                                                                                                          embeds,
+                                                                                                          polarities,
+                                                                                                          bucket,
+                                                                                                          test_size=0.2,
+                                                                                                          stratify=bucket,
+                                                                                                          shuffle=True)
+    train_tok, val_tok, train_emb, val_emb, train_pol, val_pol = train_test_split(train_tok, train_emb, train_pol,
+                                                                                  test_size=0.25, stratify=train_bck,
+                                                                                  shuffle=True)
 
-    df0 = getAmazonDF(args.dataset, args.filter_year)
-    # vectorizer, regression = seed_regression(df0)
-    # seed = seed_filter(df0, vectorizer, regression, frequency=500)
+    scale_max = np.max(polarities)
+    scale_min = np.min(polarities)
 
-    X, features_list = get_token_counts(df0.reviewText)
-    coeff = train_linear_model(X, df0.overall)
-    seed = seed_filter2(X, features_list, coeff, frequency=500)
+    glove_dataset = PolarityDataset(train_emb, train_pol)
+    glove_dataset_eval = PolarityDataset(val_emb, val_pol)
+    glove_dataset_test = PolarityDataset(test_emb, test_pol)
 
-    print(f"Seed length: {len(seed)}")
-    if embeddings_index is None:
-        embeddings_index = read_glove()
+    train_dataloader = DataLoader(glove_dataset, batch_size=32, shuffle=True, num_workers=2, drop_last=True)
+    eval_dataloader = DataLoader(glove_dataset_eval, batch_size=1, shuffle=True, num_workers=2)
+    test_dataloader = DataLoader(glove_dataset_test, batch_size=1, shuffle=True, num_workers=2)
 
+    net1 = NetSoftmax(scale_min, scale_max)
+    train(net1, train_dataloader, eval_dataloader)
+    checkpoint = {
+        'scale_max': scale_max,
+        'scale_min': scale_min,
+        'model_state_dict': net1.state_dict()
+    }
+    torch.save(checkpoint, "net1.pth")
+
+    return net1
+
+
+def domain_specific(seed, vader, embeddings_index):
     tokens, embeds, polarities, _ = dataPreparation(seed, embeddings_index)
 
     train_tok, test_tok, train_emb, test_emb, train_pol, test_pol = train_test_split(tokens, embeds, polarities,
@@ -179,8 +145,51 @@ def main(args):
     }
     torch.save(checkpoint, "net2.pth")
 
-    correlation_with_VADER(vader, seed, embeddings_index, net2)
-    #######################
+    return net2
+
+
+def main(args):
+    vader = read_vader()
+    glove = read_glove()
+
+    if args.exp == "d_generic":
+        print("\n **** DOMAIN GENERIC SENTIMENT SCORE ****\n")
+        net1 = domain_generic(vader, glove)
+
+        # TEST
+        words = ["like", "love", "amazing", "excellent", "terrible", "awful", "ugly", "complaint"]
+
+        net1.eval()
+
+        for word in words:
+            try:
+                print("Predicted", word, net1(torch.tensor(glove[word]).unsqueeze(dim=0)).detach().item())
+                print("Ground truth", word, vader[word])
+            except:
+                pass
+            print("\n")
+        ###################################################################################################
+    elif args.exp == "d_specific":
+        print("\n **** DOMAIN SPECIFIC SENTIMENT SCORE ****\n")
+
+        df0 = getAmazonDF(args.dataset, args.filter_year)
+        # vectorizer, regression = seed_regression(df0)
+        # seed = seed_filter(df0, vectorizer, regression, frequency=500)
+
+        X, features_list = get_token_counts(df0.reviewText)
+        coeff = train_linear_model(X, df0.overall)
+        seed = seed_filter2(X, features_list, coeff, frequency=500)
+        print(f"Seed length: {len(seed)}")
+
+        net2 = domain_specific(seed, vader, glove)
+        correlation_with_VADER(seed, vader, glove, net2)
+        ###################################################################################################
+    elif args.exp == "unsup_sent":
+        print("\n **** UNSUPERVISED REVIEW SENTIMENT CLASSIFICATION ****\n")
+
+        net1 = domain_generic(vader, glove)
+        unsupervised_review_sentiment(net1, glove)
+        ###################################################################################################
 
     # print("\n Unsupervised Review Sentiment Classification")
     #
@@ -203,6 +212,7 @@ if __name__ == '__main__':
     # ]
     # basic parameters
     parser = argparse.ArgumentParser()
+    parser.add_argument('--exp', type=str, default="d_specific", help='')
     parser.add_argument('--dataset', type=str, default="CamVid", help='Review dataset you are using.')
     parser.add_argument('--filter_year', action='store_true', help='Consider only the review < July 2014')
 
