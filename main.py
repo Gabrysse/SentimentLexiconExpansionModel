@@ -189,7 +189,20 @@ def main(args):
 
         net1 = domain_generic(vader, glove)
         unsupervised_review_sentiment(net1, glove)
-        ###################################################################################################
+        # DA RIVEDERE, manca la parte relativa a fast text
+
+        ###################################################################################################ù
+    elif args.exp == "fake_news":
+        # 1. Leggere dataset delle fake news https://www.kaggle.com/datasets/clmentbisaillon/fake-and-real-news-dataset
+        # 2. Tokenizzare
+        # 3. Per ogni token poi ottenere l'embedding di glove
+        # 4. Per ogni dominio usare NET2 per ottenere la predizione per quel token
+        # 5. Confrontare i valori ottenuti per ogni dominio e cercare similarità
+        pass
+    elif args.exp == "cross_lingual":
+        # Io lo inserirei così facciamo vedere che qualcosa abbiamo fatto.
+        # Lo facciamo con i domini che abbiamo trovato e pace al signore.
+        pass
 
     # print("\n Unsupervised Review Sentiment Classification")
     #
