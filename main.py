@@ -187,9 +187,8 @@ def main(args):
     elif args.exp == "unsup_sent":
         print("\n **** UNSUPERVISED REVIEW SENTIMENT CLASSIFICATION ****\n")
 
-        net1 = domain_generic(vader, glove)
-        unsupervised_review_sentiment(net1, glove)
-        # DA RIVEDERE, manca la parte relativa a fast text
+        net2 = domain_generic(vader, glove)
+        unsupervised_review_sentiment(net2, glove)
 
         ###################################################################################################ù
     elif args.exp == "fake_news":
