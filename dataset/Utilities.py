@@ -39,6 +39,25 @@ def getAmazonDF(path, filter_year=True):
     return df
 
 
+def getIMDBDF(path="IMDB Dataset.csv"):
+    df = pd.read_csv(path)
+    df.rename(columns={"review": "text", "sentiment": "label"}, inplace=True)
+    df["label"] = df["label"].apply(lambda x: -1 if x < "negative" else 1)
+
+    return df
+
+
+def getHotelReviewDF(path):
+    df = pd.read_csv("/kaggle/input/515k-hotel-reviews-data-in-europe/Hotel_Reviews.csv")[
+        ["Negative_Review", "Positive_Review", "Reviewer_Score"]]
+    df.loc[:, 'Positive_Review'] = df.Positive_Review.apply(lambda x: x.replace('No Positive', ''))
+    df.loc[:, 'Negative_Review'] = df.Negative_Review.apply(lambda x: x.replace('No Negative', ''))
+    df['text'] = df.Positive_Review + df.Negative_Review
+    df["label"] = df["Reviewer_Score"].apply(lambda x: -1 if x < 7 else 1)
+
+    return df[["text", "label"]]
+
+
 def getFakeNewsDF(true_news_path, fake_news_path):
     truedf = pd.read_csv(true_news_path)
     fakedf = pd.read_csv(fake_news_path)
@@ -46,7 +65,7 @@ def getFakeNewsDF(true_news_path, fake_news_path):
     truedf.drop(columns=["title", "subject", "date"], inplace=True)
     fakedf.drop(columns=["title", "subject", "date"], inplace=True)
     truedf['label'] = 1
-    fakedf['label'] = 0
+    fakedf['label'] = -1
     df = pd.concat([truedf, fakedf]).reset_index(drop=True)
 
     return df
