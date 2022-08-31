@@ -39,6 +39,19 @@ def getAmazonDF(path, filter_year=True):
     return df
 
 
+def getFakeNewsDF(true_news_path, fake_news_path):
+    truedf = pd.read_csv(true_news_path)
+    fakedf = pd.read_csv(fake_news_path)
+
+    truedf.drop(columns=["title", "subject", "date"], inplace=True)
+    fakedf.drop(columns=["title", "subject", "date"], inplace=True)
+    truedf['label'] = 1
+    fakedf['label'] = 0
+    df = pd.concat([truedf, fakedf]).reset_index(drop=True)
+
+    return df
+
+
 def read_vader():
     print('Indexing VADER word vectors.')
 
