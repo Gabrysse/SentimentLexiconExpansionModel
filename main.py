@@ -10,7 +10,8 @@ import time
 import os
 
 from dataset.PolarityDataset import PolarityDataset
-from dataset.Utilities import read_vader, read_glove, dataPreparation, getAmazonDF
+from dataset.Utilities import read_vader, read_glove, dataPreparation, getAmazonDF, getIMDBDF, getHotelReviewDF, \
+    getFakeNewsDF
 from neural.net_softmax import NetSoftmax
 from neural.train import train
 from preprocessing import seed_regression, seed_filter, tok, get_token_counts, train_linear_model, seed_filter2
@@ -47,32 +48,28 @@ def correlation_with_VADER(seed, vader, embeddings_index, net):
     print(f"Correlation NETPREDICTION-VADER: {stats.pearsonr(polarities_vader, polarities_net)[0]}")
 
 
-def unsupervised_review_sentiment(net, embeddings_index):
-    paths = ["aclImdb/test/neg", "aclImdb/test/pos"]
-
+def unsupervised_review_sentiment(df, net, embeddings_index):
     accuracy = 0
     tot = 0
-    for i, path in enumerate(paths):
-        print(f"Current path -> {path}")
-        tot += len(os.listdir(path))
-        for f in tqdm(os.listdir(path), position=0, leave=True):
-            with open(os.path.join(path, f), 'r') as fp:
-                review = fp.read()
-            review_tok = tok(review)
+    for i, row in df.iterrows():
+        text = row['text']
+        label = row['label']
 
-            prediction = 0
-            for word in review_tok:
-                try:
-                    prediction += net(torch.tensor(embeddings_index[word]).unsqueeze(dim=0)).detach().item()
-                except:
-                    pass
+        text_tok = tok(text)
 
-            prediction_score = prediction / len(review_tok)
+        prediction = 0
+        for word in text_tok:
+            try:
+                prediction += net(torch.tensor(embeddings_index[word]).unsqueeze(dim=0)).detach().item()
+            except:
+                pass
 
-            # print(prediction_score)
+        prediction_score = prediction / len(text_tok)
 
-            if (i == 0 and prediction_score < 0) or (i == 1 and prediction_score > 0):
-                accuracy += 1
+        # print(prediction_score)
+
+        if (label == 0 and prediction_score < 0) or (label == 1 and prediction_score > 0):
+            accuracy += 1
 
     accuracy = accuracy / tot
 
@@ -188,7 +185,22 @@ def main(args):
         print("\n **** UNSUPERVISED REVIEW SENTIMENT CLASSIFICATION ****\n")
 
         net2 = domain_generic(vader, glove)
-        unsupervised_review_sentiment(net2, glove)
+        for dataset in args.unsup_dataset:
+            if dataset == "imdb":
+                imdb = getIMDBDF()
+                unsupervised_review_sentiment(imdb, net2, glove)
+            elif dataset == "hotel":
+                hotel = getHotelReviewDF()
+                unsupervised_review_sentiment(hotel, net2, glove)
+            elif dataset == "fake_news":
+                fake_news = getFakeNewsDF()
+                unsupervised_review_sentiment(fake_news, net2, glove)
+            elif dataset == "covid_tweet":
+                covid_tweet = ...
+                unsupervised_review_sentiment(covid_tweet, net2, glove)
+            elif dataset == "spam":
+                spam = ...
+                unsupervised_review_sentiment(spam, net2, glove)
 
         ###################################################################################################ù
     elif args.exp == "fake_news":
@@ -225,8 +237,10 @@ if __name__ == '__main__':
     # basic parameters
     parser = argparse.ArgumentParser()
     parser.add_argument('--exp', type=str, default="d_specific", help='')
-    parser.add_argument('--dataset', type=str, default="CamVid", help='Review dataset you are using.')
+    parser.add_argument('--dataset', type=str, help='Review dataset you are using.')
     parser.add_argument('--filter_year', action='store_true', help='Consider only the review < July 2014')
+    parser.add_argument('--unsup_dataset', type=str, help='Dataset used for unsupervised sentiment score. '
+                                                          'Allowed values: imdb hotel fake_news covid_tweet spam')
 
     parser.add_argument('--num_epochs', type=int, default=300, help='Number of epochs to train for')
     parser.add_argument('--epoch_start_i', type=int, default=0, help='Start counting epochs from this number')
