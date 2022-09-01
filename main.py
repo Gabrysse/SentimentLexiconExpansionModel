@@ -50,6 +50,9 @@ def unsupervised_review_sentiment(df, net, embeddings_index):
     print("Calculating accuracy...")
     accuracy = 0
     skipped = 0
+
+    cache = dict()
+
     for i, row in tqdm(df.iterrows(), total=df.shape[0]):
         text = row['text']
         label = row['label']
@@ -60,7 +63,13 @@ def unsupervised_review_sentiment(df, net, embeddings_index):
             prediction = 0
             for word in text_tok:
                 try:
-                    prediction += net(torch.tensor(embeddings_index[word]).unsqueeze(dim=0)).detach().item()
+                    cached = cache.get(word)
+                    if cached is None:
+                        cached = net(torch.tensor(embeddings_index[word]).unsqueeze(dim=0)).detach().item()
+                        cache.update({word: cached})
+                    prediction += cached
+
+                    #prediction += net(torch.tensor(embeddings_index[word]).unsqueeze(dim=0)).detach().item()
                 except:
                     pass
 
