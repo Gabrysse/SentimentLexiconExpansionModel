@@ -43,7 +43,7 @@ def getIMDBDF(path="IMDB Dataset.csv"):
     print(f"\nReading IMDb review dataset...")
     df = pd.read_csv(path)
     df.rename(columns={"review": "text", "sentiment": "label"}, inplace=True)
-    df["label"] = df["label"].apply(lambda x: -1 if x < "negative" else 1)
+    df["label"] = df["label"].apply(lambda x: -1 if x == "negative" else 1)
 
     return df
 
