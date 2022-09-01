@@ -50,7 +50,6 @@ def correlation_with_VADER(seed, vader, embeddings_index, net):
 
 def unsupervised_review_sentiment(df, net, embeddings_index):
     accuracy = 0
-    tot = 0
     for i, row in df.iterrows():
         text = row['text']
         label = row['label']
@@ -71,7 +70,7 @@ def unsupervised_review_sentiment(df, net, embeddings_index):
         if (label == 0 and prediction_score < 0) or (label == 1 and prediction_score > 0):
             accuracy += 1
 
-    accuracy = accuracy / tot
+    accuracy = accuracy / len(df)
 
     return accuracy
 
