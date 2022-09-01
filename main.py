@@ -65,13 +65,11 @@ def unsupervised_review_sentiment(df, net, embeddings_index):
                     pass
 
             prediction_score = prediction / len(text_tok)
+
+            if (label == -1 and prediction_score < 0) or (label == 1 and prediction_score > 0):
+                accuracy += 1
         else:
             skipped += 1
-
-        # print(prediction_score)
-
-        if (label == 0 and prediction_score < 0) or (label == 1 and prediction_score > 0):
-            accuracy += 1
 
     accuracy = accuracy / (len(df) - skipped)
 
