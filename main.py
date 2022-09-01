@@ -190,7 +190,7 @@ def main(args):
         seed = seed_filter2(X, features_list, coeff, frequency=500)
         net2 = domain_specific(seed, vader, glove)
 
-        for dataset in args.unsup_dataset:
+        for dataset in args.unsup_dataset.split(" "):
             if dataset == "imdb":
                 imdb = getIMDBDF()
                 accuracy = unsupervised_review_sentiment(imdb, net2, glove)
