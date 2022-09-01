@@ -5,10 +5,10 @@ import numpy as np
 import pandas as pd
 
 
-def parse(path):
-    g = gzip.open(path, 'rb')
-    for l in g:
-        yield json.loads(l)
+# def parse(path):
+#     g = gzip.open(path, 'rb')
+#     for l in g:
+#         yield json.loads(l)
 
 
 def getAmazonDF(path, filter_year=True):
@@ -58,6 +58,7 @@ def getHotelReviewDF(path):
 
     return df[["text", "label"]]
 
+
 def getCoronaDF(path="kaggle/Corona_NLP_train.csv"):
     print(f"Reading Corona tweet dataset...")
     df = pd.read_csv(path, encoding="ISO-8859-1")[["OriginalTweet", "Sentiment"]]
@@ -71,6 +72,7 @@ def getCoronaDF(path="kaggle/Corona_NLP_train.csv"):
 
     return df
 
+
 def getSpamDF(path="kaggle/SPAM text message 20170820 - Data.csv"):
     print(f"Reading SPAM text message dataset...")
     df = pd.read_csv(path)
@@ -83,7 +85,7 @@ def getSpamDF(path="kaggle/SPAM text message 20170820 - Data.csv"):
     return df
 
 
-def getFakeNewsDF(true_news_path, fake_news_path):
+def getFakeNewsDF(true_news_path="True.csv", fake_news_path="Fake.csv"):
     print(f"Reading fake news dataset...")
     truedf = pd.read_csv(true_news_path)
     fakedf = pd.read_csv(fake_news_path)

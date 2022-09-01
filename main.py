@@ -50,7 +50,7 @@ def unsupervised_review_sentiment(df, net, embeddings_index):
     print("Calculating accuracy...")
     accuracy = 0
     skipped = 0
-    for i, row in df.iterrows():
+    for i, row in tqdm(df.iterrows(), total=df.shape[0]):
         text = row['text']
         label = row['label']
 
@@ -226,14 +226,6 @@ def main(args):
         # Io lo inserirei così facciamo vedere che qualcosa abbiamo fatto.
         # Lo facciamo con i domini che abbiamo trovato e pace al signore.
         pass
-
-    # print("\n Unsupervised Review Sentiment Classification")
-    #
-    # glove_vader_baseline = unsupervised_review_sentiment(net1, embeddings_index)
-    # glove_seed_accuracy = unsupervised_review_sentiment(net1, embeddings_index)
-    #
-    # print(f"Glove-Vader BASELINE: {glove_vader_baseline}")
-    # print(f"Glove-Seed ACCURACY: {glove_seed_accuracy}")
 
 
 if __name__ == '__main__':
