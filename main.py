@@ -184,7 +184,12 @@ def main(args):
     elif args.exp == "unsup_sent":
         print("\n **** UNSUPERVISED REVIEW SENTIMENT CLASSIFICATION ****\n")
 
+        df0 = getAmazonDF(args.dataset, args.filter_year)
+        X, features_list = get_token_counts(df0.reviewText)
+        coeff = train_linear_model(X, df0.overall)
+        seed = seed_filter2(X, features_list, coeff, frequency=500)
         net2 = domain_generic(vader, glove)
+
         for dataset in args.unsup_dataset:
             if dataset == "imdb":
                 imdb = getIMDBDF()
