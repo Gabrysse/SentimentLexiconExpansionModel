@@ -47,42 +47,44 @@ def correlation_with_VADER(seed, vader, embeddings_index, net):
 
 
 def unsupervised_review_sentiment(df, net, embeddings_index):
-    print("Calculating accuracy...")
-    accuracy = 0
-    skipped = 0
+    with torch.no_grad():
+        net.eval()
+        print("Calculating accuracy...")
+        accuracy = 0
+        skipped = 0
 
-    cache = dict()
+        cache = dict()
 
-    for i, row in tqdm(df.iterrows(), total=df.shape[0]):
-        text = row['text']
-        label = row['label']
+        for i, row in tqdm(df.iterrows(), total=df.shape[0]):
+            text = row['text']
+            label = row['label']
 
-        text_tok = tok(text)
-        
-        if len(text_tok) > 0:
-            prediction = 0
-            for word in text_tok:
-                try:
-                    cached = cache.get(word)
-                    if cached is None:
-                        cached = net(torch.tensor(embeddings_index[word]).unsqueeze(dim=0)).detach().item()
-                        cache.update({word: cached})
-                    prediction += cached
+            text_tok = tok(text)
 
-                    #prediction += net(torch.tensor(embeddings_index[word]).unsqueeze(dim=0)).detach().item()
-                except:
-                    pass
+            if len(text_tok) > 0:
+                prediction = 0
+                for word in text_tok:
+                    try:
+                        cached = cache.get(word)
+                        if cached is None:
+                            cached = net(torch.tensor(embeddings_index[word]).unsqueeze(dim=0)).detach().item()
+                            cache.update({word: cached})
+                        prediction += cached
 
-            prediction_score = prediction / len(text_tok)
+                        #prediction += net(torch.tensor(embeddings_index[word]).unsqueeze(dim=0)).detach().item()
+                    except:
+                        pass
 
-            if (label == -1 and prediction_score < 0) or (label == 1 and prediction_score > 0):
-                accuracy += 1
-        else:
-            skipped += 1
+                prediction_score = prediction / len(text_tok)
 
-    accuracy = accuracy / (len(df) - skipped)
+                if (label == -1 and prediction_score < 0) or (label == 1 and prediction_score > 0):
+                    accuracy += 1
+            else:
+                skipped += 1
 
-    return accuracy
+        accuracy = accuracy / (len(df) - skipped)
+
+        return accuracy
 
 
 def domain_generic(vader, embeddings_index):
