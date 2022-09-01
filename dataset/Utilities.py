@@ -65,11 +65,9 @@ def getCoronaDF(path="kaggle/Corona_NLP_train.csv"):
     df = df[df["Sentiment"] != "Neutral"]
 
     df['text'] = df.OriginalTweet
-    df['label'] = df['Sentiment'].apply(lambda x: 1 if x == "Positive" else -1 if x == "Negative" else 0)
+    df['label'] = df['Sentiment'].apply(lambda x: 1 if (x == "Positive" or x == "Extremely Positive") else -1 if (x == "Negative" or x == "Extremely Negative") else 0)
 
     df = df[['text', 'label']]
-
-    print(df.head())
 
     return df
 
@@ -81,8 +79,6 @@ def getSpamDF(path="kaggle/SPAM text message 20170820 - Data.csv"):
     df['label'] = df['Category'].apply(lambda x: 1 if x == "ham" else -1 if x == "spam" else 0)
 
     df = df[['text', 'label']]
-
-    print(df.head())
 
     return df
 
