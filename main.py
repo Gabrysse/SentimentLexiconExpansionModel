@@ -193,19 +193,24 @@ def main(args):
         for dataset in args.unsup_dataset:
             if dataset == "imdb":
                 imdb = getIMDBDF()
-                unsupervised_review_sentiment(imdb, net2, glove)
+                accuracy = unsupervised_review_sentiment(imdb, net2, glove)
+                print(f"IMDb accuracy {accuracy}")
             elif dataset == "hotel":
                 hotel = getHotelReviewDF()
-                unsupervised_review_sentiment(hotel, net2, glove)
+                accuracy = unsupervised_review_sentiment(hotel, net2, glove)
+                print(f"Hotel Review accuracy {accuracy}")
             elif dataset == "fake_news":
                 fake_news = getFakeNewsDF()
-                unsupervised_review_sentiment(fake_news, net2, glove)
+                accuracy = unsupervised_review_sentiment(fake_news, net2, glove)
+                print(f"Fake news accuracy {accuracy}")
             elif dataset == "covid_tweet":
                 covid_tweet = getCoronaDF()
                 unsupervised_review_sentiment(covid_tweet, net2, glove)
+                print(f"Corona virus tweet accuracy {accuracy}")
             elif dataset == "spam":
                 spam = getSpamDF()
-                unsupervised_review_sentiment(spam, net2, glove)
+                accuracy = unsupervised_review_sentiment(spam, net2, glove)
+                print(f"Spam email accuracy {accuracy}")
 
         ###################################################################################################ù
     elif args.exp == "fake_news":
