@@ -48,27 +48,31 @@ def correlation_with_VADER(seed, vader, embeddings_index, net):
 
 def unsupervised_review_sentiment(df, net, embeddings_index):
     accuracy = 0
+    skipped = 0
     for i, row in df.iterrows():
         text = row['text']
         label = row['label']
 
         text_tok = tok(text)
+        
+        if len(text_tok) > 0:
+            prediction = 0
+            for word in text_tok:
+                try:
+                    prediction += net(torch.tensor(embeddings_index[word]).unsqueeze(dim=0)).detach().item()
+                except:
+                    pass
 
-        prediction = 0
-        for word in text_tok:
-            try:
-                prediction += net(torch.tensor(embeddings_index[word]).unsqueeze(dim=0)).detach().item()
-            except:
-                pass
-
-        prediction_score = prediction / len(text_tok)
+            prediction_score = prediction / len(text_tok)
+        else:
+            skipped += 1
 
         # print(prediction_score)
 
         if (label == 0 and prediction_score < 0) or (label == 1 and prediction_score > 0):
             accuracy += 1
 
-    accuracy = accuracy / len(df)
+    accuracy = accuracy / (len(df) - skipped)
 
     return accuracy
 
