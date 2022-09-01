@@ -16,8 +16,6 @@ from neural.net_softmax import NetSoftmax
 from neural.train import train
 from preprocessing import seed_regression, seed_filter, tok, get_token_counts, train_linear_model, seed_filter2
 
-nltk.download('punkt')
-
 
 def correlation_with_VADER(seed, vader, embeddings_index, net):
     polarities_vader = []
@@ -145,6 +143,8 @@ def domain_specific(seed, vader, embeddings_index):
 
 
 def main(args):
+    nltk.download('punkt')
+
     vader = read_vader()
     glove = read_glove()
 
