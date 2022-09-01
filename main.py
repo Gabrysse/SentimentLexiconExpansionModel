@@ -11,7 +11,7 @@ import os
 
 from dataset.PolarityDataset import PolarityDataset
 from dataset.Utilities import read_vader, read_glove, dataPreparation, getAmazonDF, getIMDBDF, getHotelReviewDF, \
-    getFakeNewsDF
+    getFakeNewsDF, getCoronaDF, getSpamDF
 from neural.net_softmax import NetSoftmax
 from neural.train import train
 from preprocessing import seed_regression, seed_filter, tok, get_token_counts, train_linear_model, seed_filter2
@@ -183,13 +183,8 @@ def main(args):
         ###################################################################################################
     elif args.exp == "unsup_sent":
         print("\n **** UNSUPERVISED REVIEW SENTIMENT CLASSIFICATION ****\n")
-        
-        df0 = getAmazonDF(args.dataset, args.filter_year)
-        X, features_list = get_token_counts(df0.reviewText)
-        coeff = train_linear_model(X, df0.overall)
-        seed = seed_filter2(X, features_list, coeff, frequency=500)
-        net2 = domain_specific(vader, glove)
-        
+
+        net2 = domain_generic(vader, glove)
         for dataset in args.unsup_dataset:
             if dataset == "imdb":
                 imdb = getIMDBDF()
@@ -201,10 +196,10 @@ def main(args):
                 fake_news = getFakeNewsDF()
                 unsupervised_review_sentiment(fake_news, net2, glove)
             elif dataset == "covid_tweet":
-                covid_tweet = ...
+                covid_tweet = getCoronaDF()
                 unsupervised_review_sentiment(covid_tweet, net2, glove)
             elif dataset == "spam":
-                spam = ...
+                spam = getSpamDF()
                 unsupervised_review_sentiment(spam, net2, glove)
 
         ###################################################################################################ù

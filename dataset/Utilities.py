@@ -57,6 +57,32 @@ def getHotelReviewDF(path):
 
     return df[["text", "label"]]
 
+def getCoronaDF(path="kaggle/Corona_NLP_train.csv"):
+    df = pd.read_csv(path, encoding="ISO-8859-1")[["OriginalTweet", "Sentiment"]]
+
+    df = df[df["Sentiment"] != "Neutral"]
+
+    df['text'] = df.OriginalTweet
+    df['label'] = df['Sentiment'].apply(lambda x: 1 if x == "Positive" else -1 if x == "Negative" else 0)
+
+    df = df[['text', 'label']]
+
+    print(df.head())
+
+    return df
+
+def getSpamDF(path="kaggle/SPAM text message 20170820 - Data.csv"):
+    df = pd.read_csv(path)
+
+    df['text'] = df.Message
+    df['label'] = df['Category'].apply(lambda x: 1 if x == "ham" else -1 if x == "spam" else 0)
+
+    df = df[['text', 'label']]
+
+    print(df.head())
+
+    return df
+
 
 def getFakeNewsDF(true_news_path, fake_news_path):
     truedf = pd.read_csv(true_news_path)
