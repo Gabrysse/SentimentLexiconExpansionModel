@@ -40,7 +40,7 @@ def getAmazonDF(path, filter_year=True):
 
 
 def getIMDBDF(path="IMDB Dataset.csv"):
-    print(f"Reading IMDb review dataset...")
+    print(f"\nReading IMDb review dataset...")
     df = pd.read_csv(path)
     df.rename(columns={"review": "text", "sentiment": "label"}, inplace=True)
     df["label"] = df["label"].apply(lambda x: -1 if x < "negative" else 1)
@@ -48,9 +48,9 @@ def getIMDBDF(path="IMDB Dataset.csv"):
     return df
 
 
-def getHotelReviewDF(path):
-    print(f"Reading Hotel review dataset...")
-    df = pd.read_csv("Hotel_Reviews.csv")[["Negative_Review", "Positive_Review", "Reviewer_Score"]]
+def getHotelReviewDF(path="Hotel_Reviews.csv"):
+    print(f"\nReading Hotel review dataset...")
+    df = pd.read_csv(path)[["Negative_Review", "Positive_Review", "Reviewer_Score"]]
     df.loc[:, 'Positive_Review'] = df.Positive_Review.apply(lambda x: x.replace('No Positive', ''))
     df.loc[:, 'Negative_Review'] = df.Negative_Review.apply(lambda x: x.replace('No Negative', ''))
     df['text'] = df.Positive_Review + df.Negative_Review
@@ -59,8 +59,8 @@ def getHotelReviewDF(path):
     return df[["text", "label"]]
 
 
-def getCoronaDF(path="kaggle/Corona_NLP_train.csv"):
-    print(f"Reading Corona tweet dataset...")
+def getCoronaDF(path="Corona_NLP_train.csv"):
+    print(f"\nReading Corona tweet dataset...")
     df = pd.read_csv(path, encoding="ISO-8859-1")[["OriginalTweet", "Sentiment"]]
 
     df = df[df["Sentiment"] != "Neutral"]
@@ -73,8 +73,8 @@ def getCoronaDF(path="kaggle/Corona_NLP_train.csv"):
     return df
 
 
-def getSpamDF(path="kaggle/SPAM text message 20170820 - Data.csv"):
-    print(f"Reading SPAM text message dataset...")
+def getSpamDF(path="SPAM text message 20170820 - Data.csv"):
+    print(f"\nReading SPAM text message dataset...")
     df = pd.read_csv(path)
 
     df['text'] = df.Message
@@ -86,7 +86,7 @@ def getSpamDF(path="kaggle/SPAM text message 20170820 - Data.csv"):
 
 
 def getFakeNewsDF(true_news_path="True.csv", fake_news_path="Fake.csv"):
-    print(f"Reading fake news dataset...")
+    print(f"\nReading fake news dataset...")
     truedf = pd.read_csv(true_news_path)
     fakedf = pd.read_csv(fake_news_path)
 
@@ -100,7 +100,7 @@ def getFakeNewsDF(true_news_path="True.csv", fake_news_path="Fake.csv"):
 
 
 def read_vader():
-    print('Indexing VADER word vectors.')
+    print('\nIndexing VADER word vectors.')
 
     vader = {}
     f = open('vader_lexicon.txt', encoding='utf-8')
