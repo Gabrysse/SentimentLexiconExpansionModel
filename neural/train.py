@@ -60,18 +60,15 @@ def train(model, train_dataloader, eval_dataloader, epoch_num=150, batch_size=32
 
             running_loss += loss.item()
 
+        tq.close()
         val_loss = val(model, eval_dataloader, criterion)
         print("\nValidation loss: ", val_loss)
         scheduler.step(val_loss)
 
         early_stopping(val_loss, model)
-
         if early_stopping.early_stop:
             print("Early stopping")
             break
 
-        tq.close()
-
     # model.load_state_dict(torch.load('checkpoint.pt'))
-
     print('Finished Training')
