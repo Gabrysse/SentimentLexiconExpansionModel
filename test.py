@@ -7,8 +7,8 @@ from dataset.Utilities import read_glove, getIMDBDF, getHotelReviewDF, getFakeNe
 
 
 def word_ranking(word_dict, N=10):
-    top_pos_words = dict(sorted(word_dict.items(), key=lambda item: item[1])[0:N])
-    top_neg_words = dict(sorted(word_dict.items(), key=lambda item: item[1])[0:N], reverse=True)
+    top_neg_words = dict(sorted(word_dict.items(), key=lambda item: item[1])[0:N])
+    top_pos_words = dict(sorted(word_dict.items(), key=lambda item: item[1], reverse=True)[0:N])
 
     return top_pos_words, top_neg_words
 
@@ -40,13 +40,13 @@ def main(args):
 
         if df is not None:
             accuracy, cache = unsupervised_review_sentiment(df, model, glove)
-            print(f"{name} accuracy {accuracy}")
+            print(f"🏆 {name} accuracy {accuracy}")
             if args.word_ranking:
                 top_pos_words, top_neg_words = word_ranking(cache)
-                print(" POSITIVE WORDS RANKING ")
+                print("⬆ POSITIVE WORDS RANKING ⬆")
                 for elem in list(top_pos_words.items()):
                     print(elem)
-                print(" NEGATIVE WORDS RANKING ")
+                print("⬇ NEGATIVE WORDS RANKING ⬇")
                 for elem in list(top_neg_words.items()):
                     print(elem)
 
