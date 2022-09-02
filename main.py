@@ -87,7 +87,7 @@ def unsupervised_review_sentiment(df, net, embeddings_index):
         return accuracy, cache
 
 
-def domain_generic(vader, embeddings_index, ckp_dataset_name):
+def domain_generic(vader, embeddings_index, ckp_name):
     # VALIDATION WITH VADER
     tokens, embeds, polarities, bucket = dataPreparation(vader, embeddings_index)
 
@@ -120,12 +120,12 @@ def domain_generic(vader, embeddings_index, ckp_dataset_name):
         'scale_min': scale_min,
         'model_state_dict': net1.state_dict()
     }
-    torch.save(checkpoint, f"net1_{ckp_dataset_name}.pth")
+    torch.save(checkpoint, f"net1_{ckp_name}.pth")
 
     return net1
 
 
-def domain_specific(seed, vader, embeddings_index, ckp_dataset_name):
+def domain_specific(seed, vader, embeddings_index, ckp_name):
     tokens, embeds, polarities, _ = dataPreparation(seed, embeddings_index)
 
     train_tok, test_tok, train_emb, test_emb, train_pol, test_pol = train_test_split(tokens, embeds, polarities,
@@ -151,7 +151,7 @@ def domain_specific(seed, vader, embeddings_index, ckp_dataset_name):
         'scale_min': scale_min,
         'model_state_dict': net2.state_dict()
     }
-    torch.save(checkpoint, "net2_{ckp_dataset_name}.pth")
+    torch.save(checkpoint, f"net2_{ckp_name}.pth")
 
     return net2
 
