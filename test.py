@@ -9,7 +9,7 @@ from dataset.Utilities import read_glove, getIMDBDF, getHotelReviewDF, getFakeNe
 def main(args):
     glove = read_glove()
 
-    loaded_checkpoint = torch.load("net2.pth")
+    loaded_checkpoint = torch.load(args.checkpoint)
     model = NetSoftmax(loaded_checkpoint['scale_min'], loaded_checkpoint['scale_max'])
     model.load_state_dict(loaded_checkpoint['model_state_dict'])
 
@@ -41,6 +41,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--checkpoint', type=str, default='net2.pth', help='Checkpoint path')
     parser.add_argument('--unsup_dataset', type=str, help='Dataset used for unsupervised sentiment score. '
                                                           'Allowed values: imdb hotel fake_news covid_tweet spam')
     args = parser.parse_args()
