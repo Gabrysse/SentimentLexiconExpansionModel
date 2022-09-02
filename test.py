@@ -3,8 +3,7 @@ import torch
 
 from main import unsupervised_review_sentiment
 from neural.net_softmax import NetSoftmax
-from dataset.Utilities import read_vader, read_glove, dataPreparation, getAmazonDF, getIMDBDF, getHotelReviewDF, \
-    getFakeNewsDF, getCoronaDF, getSpamDF
+from dataset.Utilities import read_glove, getIMDBDF, getHotelReviewDF, getFakeNewsDF, getCoronaDF, getSpamDF
 
 
 def main(args):
@@ -12,7 +11,7 @@ def main(args):
 
     loaded_checkpoint = torch.load("net2.pth")
     model = NetSoftmax(loaded_checkpoint['scale_min'], loaded_checkpoint['scale_max'])
-    model.module.load_state_dict(loaded_checkpoint['model_state_dict'])
+    model.load_state_dict(loaded_checkpoint['model_state_dict'])
 
     with torch.no_grad():
         model.eval()

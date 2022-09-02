@@ -13,21 +13,21 @@ def tok(doc):
 
 
 def get_token_counts(reviews):
-    print("Calculating token count...")
+    print("🔢 Calculating token count...")
     vectorizer = CountVectorizer(tokenizer=tok, min_df=25)
     X = vectorizer.fit_transform(reviews)
     return X, vectorizer.get_feature_names_out()
 
 
 def train_linear_model(X, y):
-    print("Training linear model...")
+    print("🏃🏻 Training linear model...")
     regression = Ridge()
     regression.fit(X, y)
     return regression.coef_
 
 
 def seed_filter2(X, features, coeff, frequency=500):
-    print("Seed filtering...")
+    print("🔍 Seed filtering...\n")
     mask = np.array(X.sum(axis=0) > frequency).squeeze()
     tokens = features[mask]
     coefs = coeff[mask]
