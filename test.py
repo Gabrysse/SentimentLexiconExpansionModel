@@ -6,6 +6,13 @@ from neural.net_softmax import NetSoftmax
 from dataset.Utilities import read_glove, getIMDBDF, getHotelReviewDF, getFakeNewsDF, getCoronaDF, getSpamDF
 
 
+def word_ranking(word_dict, N=10):
+    top_pos_words = dict(sorted(word_dict.items(), key=lambda item: item[1])[0:N])
+    top_neg_words = dict(sorted(word_dict.items(), key=lambda item: item[1])[0:N], reverse=True)
+
+    return top_pos_words, top_neg_words
+
+
 def main(args):
     glove = read_glove()
 
@@ -13,30 +20,35 @@ def main(args):
     model = NetSoftmax(loaded_checkpoint['scale_min'], loaded_checkpoint['scale_max'])
     model.load_state_dict(loaded_checkpoint['model_state_dict'])
 
-    with torch.no_grad():
-        model.eval()
+    for dataset in args.unsup_dataset.split(" "):
+        df = None
+        if dataset == "imdb":
+            name = "IMDb"
+            df = getIMDBDF()
+        elif dataset == "hotel":
+            name = "Hotel Review"
+            df = getHotelReviewDF()
+        elif dataset == "fake_news":
+            name = "Fake news"
+            df = getFakeNewsDF()
+        elif dataset == "covid_tweet":
+            name = "Corona virus tweet"
+            df = getCoronaDF()
+        elif dataset == "spam":
+            name = "Spam email"
+            df = getSpamDF()
 
-        for dataset in args.unsup_dataset.split(" "):
-            if dataset == "imdb":
-                imdb = getIMDBDF()
-                accuracy = unsupervised_review_sentiment(imdb, model, glove)
-                print(f"IMDb accuracy {accuracy}")
-            elif dataset == "hotel":
-                hotel = getHotelReviewDF()
-                accuracy = unsupervised_review_sentiment(hotel, model, glove)
-                print(f"Hotel Review accuracy {accuracy}")
-            elif dataset == "fake_news":
-                fake_news = getFakeNewsDF()
-                accuracy = unsupervised_review_sentiment(fake_news, model, glove)
-                print(f"Fake news accuracy {accuracy}")
-            elif dataset == "covid_tweet":
-                covid_tweet = getCoronaDF()
-                accuracy = unsupervised_review_sentiment(covid_tweet, model, glove)
-                print(f"Corona virus tweet accuracy {accuracy}")
-            elif dataset == "spam":
-                spam = getSpamDF()
-                accuracy = unsupervised_review_sentiment(spam, model, glove)
-                print(f"Spam email accuracy {accuracy}")
+        if df is not None:
+            accuracy, cache = unsupervised_review_sentiment(df, model, glove)
+            print(f"{name} accuracy {accuracy}")
+            if args.word_ranking:
+                top_pos_words, top_neg_words = word_ranking(cache)
+                print(" POSITIVE WORDS RANKING ")
+                for elem in list(top_pos_words.items()):
+                    print(elem)
+                print(" NEGATIVE WORDS RANKING ")
+                for elem in list(top_neg_words.items()):
+                    print(elem)
 
 
 if __name__ == '__main__':
@@ -44,5 +56,7 @@ if __name__ == '__main__':
     parser.add_argument('--checkpoint', type=str, default='net2.pth', help='Checkpoint path')
     parser.add_argument('--unsup_dataset', type=str, help='Dataset used for unsupervised sentiment score. '
                                                           'Allowed values: imdb hotel fake_news covid_tweet spam')
+    parser.add_argument('--word_ranking', action="store_true", help="Use this if you want to get the ranking of "
+                                                                    "positive and negative word")
     args = parser.parse_args()
     main(args)

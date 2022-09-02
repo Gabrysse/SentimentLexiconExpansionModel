@@ -84,7 +84,7 @@ def unsupervised_review_sentiment(df, net, embeddings_index):
 
         accuracy = accuracy / (len(df) - skipped)
 
-        return accuracy
+        return accuracy, cache
 
 
 def domain_generic(vader, embeddings_index):
@@ -206,23 +206,23 @@ def main(args):
         for dataset in args.unsup_dataset.split(" "):
             if dataset == "imdb":
                 imdb = getIMDBDF()
-                accuracy = unsupervised_review_sentiment(imdb, net2, glove)
+                accuracy, _ = unsupervised_review_sentiment(imdb, net2, glove)
                 print(f"IMDb accuracy {accuracy}")
             elif dataset == "hotel":
                 hotel = getHotelReviewDF()
-                accuracy = unsupervised_review_sentiment(hotel, net2, glove)
+                accuracy, _ = unsupervised_review_sentiment(hotel, net2, glove)
                 print(f"Hotel Review accuracy {accuracy}")
             elif dataset == "fake_news":
                 fake_news = getFakeNewsDF()
-                accuracy = unsupervised_review_sentiment(fake_news, net2, glove)
+                accuracy, _ = unsupervised_review_sentiment(fake_news, net2, glove)
                 print(f"Fake news accuracy {accuracy}")
             elif dataset == "covid_tweet":
                 covid_tweet = getCoronaDF()
-                accuracy = unsupervised_review_sentiment(covid_tweet, net2, glove)
+                accuracy, _ = unsupervised_review_sentiment(covid_tweet, net2, glove)
                 print(f"Corona virus tweet accuracy {accuracy}")
             elif dataset == "spam":
                 spam = getSpamDF()
-                accuracy = unsupervised_review_sentiment(spam, net2, glove)
+                accuracy, _ = unsupervised_review_sentiment(spam, net2, glove)
                 print(f"Spam email accuracy {accuracy}")
 
         ###################################################################################################ù
