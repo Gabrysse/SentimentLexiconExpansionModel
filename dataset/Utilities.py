@@ -12,7 +12,7 @@ import pandas as pd
 
 
 def getAmazonDF(path, filter_year=True):
-    print(f"Reading review dataset [{path}, {filter_year}]...")
+    print(f"📖 Reading review dataset [{path}, {filter_year}]...")
     review_dict = {}
     # i = 0
     # for d in parse(path):
@@ -40,7 +40,7 @@ def getAmazonDF(path, filter_year=True):
 
 
 def getIMDBDF(path="IMDB Dataset.csv"):
-    print(f"\nReading IMDb review dataset...")
+    print(f"\n📖 Reading IMDb review dataset...")
     df = pd.read_csv(path)
     df.rename(columns={"review": "text", "sentiment": "label"}, inplace=True)
     df["label"] = df["label"].apply(lambda x: -1 if x == "negative" else 1)
@@ -49,7 +49,7 @@ def getIMDBDF(path="IMDB Dataset.csv"):
 
 
 def getHotelReviewDF(path="Hotel_Reviews.csv"):
-    print(f"\nReading Hotel review dataset...")
+    print(f"\n📖 Reading Hotel review dataset...")
     df = pd.read_csv(path)[["Negative_Review", "Positive_Review", "Reviewer_Score"]]
     df.loc[:, 'Positive_Review'] = df.Positive_Review.apply(lambda x: x.replace('No Positive', ''))
     df.loc[:, 'Negative_Review'] = df.Negative_Review.apply(lambda x: x.replace('No Negative', ''))
@@ -60,7 +60,7 @@ def getHotelReviewDF(path="Hotel_Reviews.csv"):
 
 
 def getCoronaDF(path="Corona_NLP_train.csv"):
-    print(f"\nReading Corona tweet dataset...")
+    print(f"\n📖 Reading Corona tweet dataset...")
     df = pd.read_csv(path, encoding="ISO-8859-1")[["OriginalTweet", "Sentiment"]]
 
     df = df[df["Sentiment"] != "Neutral"]
@@ -74,7 +74,7 @@ def getCoronaDF(path="Corona_NLP_train.csv"):
 
 
 def getSpamDF(path="SPAM text message 20170820 - Data.csv"):
-    print(f"\nReading SPAM text message dataset...")
+    print(f"\n📖 Reading SPAM text message dataset...")
     df = pd.read_csv(path)
 
     df['text'] = df.Message
@@ -86,7 +86,7 @@ def getSpamDF(path="SPAM text message 20170820 - Data.csv"):
 
 
 def getFakeNewsDF(true_news_path="True.csv", fake_news_path="Fake.csv"):
-    print(f"\nReading fake news dataset...")
+    print(f"\n📖 Reading fake news dataset...")
     truedf = pd.read_csv(true_news_path)
     fakedf = pd.read_csv(fake_news_path)
 

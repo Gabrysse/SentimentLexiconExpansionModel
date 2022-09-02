@@ -7,16 +7,16 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 from neural.EarlyStopping import EarlyStopping
 
 
-def val(net, eval_dataloader, criterion):
+def val(model, eval_dataloader, criterion):
     with torch.no_grad():
-        net.eval()
+        model.eval()
 
         val_loss = []
         for i, data in enumerate(eval_dataloader, 0):
             inputs, labels = data
 
-            outputs = net(inputs)
-            loss = criterion(outputs, labels)
+            prediction = model(inputs)
+            loss = criterion(prediction, labels)
 
             val_loss.append(loss.item())
 
@@ -28,15 +28,15 @@ def get_lr(optimizer):
         return param_group['lr']
 
 
-def train(net, train_dataloader, eval_dataloader, epoch_num=150, batch_size=32):
-    # criterion = nn.L1Loss()
+def train(model, train_dataloader, eval_dataloader, epoch_num=150, batch_size=32):
+    torch.manual_seed(15)
     criterion = nn.MSELoss()
-    optimizer = Adam(net.parameters(), lr=0.001)
+    optimizer = Adam(model.parameters(), lr=0.001)
     scheduler = ReduceLROnPlateau(optimizer, 'min', patience=3, factor=0.5)
     early_stopping = EarlyStopping(patience=12, verbose=False)
 
     for epoch in range(epoch_num):
-        net.train()
+        model.train()
         running_loss = 0.0
         lr = get_lr(optimizer)
 
@@ -44,14 +44,13 @@ def train(net, train_dataloader, eval_dataloader, epoch_num=150, batch_size=32):
         tq.set_description(f'epoch {epoch}, lr {lr:.6f}')
 
         for i, data in enumerate(train_dataloader, 0):
-            inputs, labels = data
-
             optimizer.zero_grad()
-
-            outputs = net(inputs)
-            # print(outputs.shape)
-            # print(labels.shape)
-            loss = criterion(outputs.squeeze(), labels.squeeze())
+            inputs, labels = data
+            labels = labels.reshape(-1, 1)
+            prediction = model(inputs)
+            # print(prediction.size())
+            # print(labels.size())
+            loss = criterion(prediction, labels)
 
             tq.update(batch_size)
             tq.set_postfix(loss='%.6f' % loss)
@@ -61,11 +60,11 @@ def train(net, train_dataloader, eval_dataloader, epoch_num=150, batch_size=32):
 
             running_loss += loss.item()
 
-        val_loss = val(net, eval_dataloader, criterion)
+        val_loss = val(model, eval_dataloader, criterion)
         print("\nValidation loss: ", val_loss)
         scheduler.step(val_loss)
 
-        early_stopping(val_loss, net)
+        early_stopping(val_loss, model)
 
         if early_stopping.early_stop:
             print("Early stopping")
@@ -73,6 +72,6 @@ def train(net, train_dataloader, eval_dataloader, epoch_num=150, batch_size=32):
 
         tq.close()
 
-    # net.load_state_dict(torch.load('checkpoint.pt'))
+    # model.load_state_dict(torch.load('checkpoint.pt'))
 
     print('Finished Training')
