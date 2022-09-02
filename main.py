@@ -87,7 +87,7 @@ def unsupervised_review_sentiment(df, net, embeddings_index):
         return accuracy, cache
 
 
-def domain_generic(vader, embeddings_index):
+def domain_generic(vader, embeddings_index, ckp_dataset_name):
     # VALIDATION WITH VADER
     tokens, embeds, polarities, bucket = dataPreparation(vader, embeddings_index)
 
@@ -120,12 +120,12 @@ def domain_generic(vader, embeddings_index):
         'scale_min': scale_min,
         'model_state_dict': net1.state_dict()
     }
-    torch.save(checkpoint, "net1.pth")
+    torch.save(checkpoint, f"net1_{ckp_dataset_name}.pth")
 
     return net1
 
 
-def domain_specific(seed, vader, embeddings_index):
+def domain_specific(seed, vader, embeddings_index, ckp_dataset_name):
     tokens, embeds, polarities, _ = dataPreparation(seed, embeddings_index)
 
     train_tok, test_tok, train_emb, test_emb, train_pol, test_pol = train_test_split(tokens, embeds, polarities,
@@ -151,7 +151,7 @@ def domain_specific(seed, vader, embeddings_index):
         'scale_min': scale_min,
         'model_state_dict': net2.state_dict()
     }
-    torch.save(checkpoint, "net2.pth")
+    torch.save(checkpoint, "net2_{ckp_dataset_name}.pth")
 
     return net2
 
@@ -164,7 +164,7 @@ def main(args):
 
     if args.exp == "d_generic":
         print("\n **** DOMAIN GENERIC SENTIMENT SCORE ****\n")
-        net1 = domain_generic(vader, glove)
+        net1 = domain_generic(vader, glove, os.path.basename(args.dataset).split('.')[0])
 
         # TEST
         words = ["like", "love", "amazing", "excellent", "terrible", "awful", "ugly", "complaint"]
@@ -191,7 +191,7 @@ def main(args):
         seed = seed_filter2(X, features_list, coeff, frequency=500)
         print(f"Seed length: {len(seed)}")
 
-        net2 = domain_specific(seed, vader, glove)
+        net2 = domain_specific(seed, vader, glove, f"{os.path.basename(args.dataset).split('.')[0]}_{args.filter_year}")
         correlation_with_VADER(seed, vader, glove, net2)
         ###################################################################################################
     elif args.exp == "unsup_sent":
@@ -201,7 +201,7 @@ def main(args):
         X, features_list = get_token_counts(df0.reviewText)
         coeff = train_linear_model(X, df0.overall)
         seed = seed_filter2(X, features_list, coeff, frequency=500)
-        net2 = domain_specific(seed, vader, glove)
+        net2 = domain_specific(seed, vader, glove, f"{os.path.basename(args.dataset).split('.')[0]}_{args.filter_year}")
 
         for dataset in args.unsup_dataset.split(" "):
             if dataset == "imdb":
@@ -252,7 +252,7 @@ if __name__ == '__main__':
     # basic parameters
     parser = argparse.ArgumentParser()
     parser.add_argument('--exp', type=str, default="d_specific", help='')
-    parser.add_argument('--dataset', type=str, help='Review dataset you are using.')
+    parser.add_argument('--dataset', type=str, help='The amazon review dataset path you want to use')
     parser.add_argument('--filter_year', action='store_true', help='Consider only the review < July 2014')
     parser.add_argument('--unsup_dataset', type=str, help='Dataset used for unsupervised sentiment score. '
                                                           'Allowed values: imdb hotel fake_news covid_tweet spam')

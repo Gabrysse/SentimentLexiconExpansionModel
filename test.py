@@ -43,10 +43,10 @@ def main(args):
             print(f"🏆 {name} accuracy {accuracy}")
             if args.word_ranking:
                 top_pos_words, top_neg_words = word_ranking(cache)
-                print("⬆ POSITIVE WORDS RANKING ⬆")
+                print("👍 POSITIVE WORDS RANKING")
                 for elem in list(top_pos_words.items()):
                     print(elem)
-                print("⬇ NEGATIVE WORDS RANKING ⬇")
+                print("👎 NEGATIVE WORDS RANKING")
                 for elem in list(top_neg_words.items()):
                     print(elem)
 
