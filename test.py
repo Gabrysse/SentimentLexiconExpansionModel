@@ -11,7 +11,7 @@ def word_ranking(word_dict, N=10, diff=False):
     top_pos_words = dict(sorted(word_dict.items(), key=lambda item: item[1], reverse=True)[0:N])
 
     if diff:
-        print(f"👍 TOP {N} WORDS CHANGED IN POSITIVE")
+        print(f"\n👍 TOP {N} WORDS CHANGED IN POSITIVE")
         for elem in list(top_pos_words.items()):
             print(elem)
         print(f"👎 TOP {N} WORDS CHANGED IN NEGATIVE")
@@ -36,6 +36,7 @@ def word_difference(dict1, dict2):
                 difference[key] = dict2[key] - dict1[key]
 
     return difference
+
 
 def main(args):
     glove = read_glove()
@@ -79,7 +80,7 @@ def main(args):
                 if args.word_ranking:
                     top_pos_words, top_neg_words = word_ranking(cache2)
                     difference = word_difference(cache1, cache2)
-                    word_ranking(difference)
+                    word_ranking(difference, diff=True)
 
 
 if __name__ == '__main__':
