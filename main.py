@@ -71,7 +71,7 @@ def unsupervised_review_sentiment(df, net, embeddings_index):
                             cache.update({word: cached})
                         prediction += cached
 
-                        #prediction += net(torch.tensor(embeddings_index[word]).unsqueeze(dim=0)).detach().item()
+                        # prediction += net(torch.tensor(embeddings_index[word]).unsqueeze(dim=0)).detach().item()
                     except:
                         pass
 
@@ -82,7 +82,7 @@ def unsupervised_review_sentiment(df, net, embeddings_index):
             else:
                 skipped += 1
 
-        accuracy = accuracy / (len(df) - skipped)
+        accuracy = round(accuracy / (len(df) - skipped), 6)
 
         return accuracy, cache
 
@@ -204,26 +204,26 @@ def main(args):
         net2 = domain_specific(seed, vader, glove, f"{os.path.basename(args.dataset).split('.')[0]}_{args.filter_year}")
 
         for dataset in args.unsup_dataset.split(" "):
+            df = None
             if dataset == "imdb":
-                imdb = getIMDBDF()
-                accuracy, _ = unsupervised_review_sentiment(imdb, net2, glove)
-                print(f"IMDb accuracy {accuracy}")
+                name = "IMDb"
+                df = getIMDBDF()
             elif dataset == "hotel":
-                hotel = getHotelReviewDF()
-                accuracy, _ = unsupervised_review_sentiment(hotel, net2, glove)
-                print(f"Hotel Review accuracy {accuracy}")
+                name = "Hotel Review"
+                df = getHotelReviewDF()
             elif dataset == "fake_news":
-                fake_news = getFakeNewsDF()
-                accuracy, _ = unsupervised_review_sentiment(fake_news, net2, glove)
-                print(f"Fake news accuracy {accuracy}")
+                name = "Fake news"
+                df = getFakeNewsDF()
             elif dataset == "covid_tweet":
-                covid_tweet = getCoronaDF()
-                accuracy, _ = unsupervised_review_sentiment(covid_tweet, net2, glove)
-                print(f"Corona virus tweet accuracy {accuracy}")
+                name = "Corona virus tweet"
+                df = getCoronaDF()
             elif dataset == "spam":
-                spam = getSpamDF()
-                accuracy, _ = unsupervised_review_sentiment(spam, net2, glove)
-                print(f"Spam email accuracy {accuracy}")
+                name = "Spam email"
+                df = getSpamDF()
+
+            if df is not None:
+                accuracy, cache = unsupervised_review_sentiment(df, net2, glove)
+                print(f"🏆 {name} accuracy {accuracy}")
 
         ###################################################################################################ù
     elif args.exp == "fake_news":
