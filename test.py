@@ -7,8 +7,8 @@ from dataset.Utilities import read_glove, getIMDBDF, getHotelReviewDF, getFakeNe
 
 
 def word_ranking(word_dict, N=10, diff=False):
-    top_neg_words = dict(sorted(word_dict.items(), key=lambda item: item[1])[0:N])
-    top_pos_words = dict(sorted(word_dict.items(), key=lambda item: item[1], reverse=True)[0:N])
+    top_neg_words = dict(sorted(word_dict.items(), key=lambda item: item[1][0])[0:N])
+    top_pos_words = dict(sorted(word_dict.items(), key=lambda item: item[1][0], reverse=True)[0:N])
 
     if diff:
         print(f"\n👍 TOP {N} WORDS CHANGED IN POSITIVE")
@@ -32,8 +32,8 @@ def word_difference(dict1, dict2):
     difference = {}
     for key in dict2.keys():
         if key in dict1.keys():
-            if (dict2[key][0] > 0 and dict1[key][0] < 0) or (dict2[key][0] < 0 and dict1[key][0] > 0):
-                difference[key] = dict2[key][0] - dict1[key][0]
+            if (dict2[key][0] > 0.05 and dict1[key][0] < -0.05) or (dict2[key][0] < -0.05 and dict1[key][0] > 0.05):
+                difference[key] = (dict2[key][0] - dict1[key][0], dict2[key][1])
 
     return difference
 
