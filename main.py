@@ -67,9 +67,12 @@ def unsupervised_review_sentiment(df, net, embeddings_index):
                     try:
                         cached = cache.get(word)
                         if cached is None:
-                            cached = net(torch.tensor(embeddings_index[word]).unsqueeze(dim=0)).detach().item()
+                            cached = (net(torch.tensor(embeddings_index[word]).unsqueeze(dim=0)).detach().item(), 1)
                             cache.update({word: cached})
-                        prediction += cached
+                        else:
+                            cached = (cached[0], cached[1] + 1)
+                            cache.update({word: cached})
+                        prediction += cached[0]
 
                         # prediction += net(torch.tensor(embeddings_index[word]).unsqueeze(dim=0)).detach().item()
                     except:
