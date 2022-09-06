@@ -32,8 +32,8 @@ def word_difference(dict1, dict2):
     difference = {}
     for key in dict2.keys():
         if key in dict1.keys():
-            if (dict2[key] > 0 and dict1[key] < 0) or (dict2[key] < 0 and dict1[key] > 0):
-                difference[key] = dict2[key] - dict1[key]
+            if (dict2[key][0] > 0 and dict1[key][0] < 0) or (dict2[key][0] < 0 and dict1[key][0] > 0):
+                difference[key] = dict2[key][0] - dict1[key][0]
 
     return difference
 

@@ -49,7 +49,7 @@ def correlation_with_VADER(seed, vader, embeddings_index, net):
 def unsupervised_review_sentiment(df, net, embeddings_index):
     with torch.no_grad():
         net.eval()
-        print("⚙ Calculating accuracy...")
+        print("\n⚙ Calculating accuracy...")
         accuracy = 0
         skipped = 0
 
