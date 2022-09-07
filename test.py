@@ -6,7 +6,7 @@ from neural.net_softmax import NetSoftmax
 from dataset.Utilities import read_glove, getIMDBDF, getHotelReviewDF, getFakeNewsDF, getCoronaDF, getSpamDF
 
 
-def word_ranking(word_dict, N=10, diff=False):
+def word_ranking(word_dict, N=20, diff=False):
     top_neg_words = dict(sorted(word_dict.items(), key=lambda item: item[1][0])[0:N])
     top_pos_words = dict(sorted(word_dict.items(), key=lambda item: item[1][0], reverse=True)[0:N])
 

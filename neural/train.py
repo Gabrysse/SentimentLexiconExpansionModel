@@ -28,7 +28,7 @@ def get_lr(optimizer):
         return param_group['lr']
 
 
-def train(model, train_dataloader, eval_dataloader, epoch_num=150, batch_size=32):
+def train(model, train_dataloader, eval_dataloader, epoch_num=100, batch_size=32):
     torch.manual_seed(15)
     criterion = nn.MSELoss()
     optimizer = Adam(model.parameters(), lr=0.001)
