@@ -14,6 +14,7 @@ def val(model, eval_dataloader, criterion):
         val_loss = []
         for i, data in enumerate(eval_dataloader, 0):
             inputs, labels = data
+            labels = labels.reshape(-1, 1)
 
             prediction = model(inputs)
             loss = criterion(prediction, labels)
