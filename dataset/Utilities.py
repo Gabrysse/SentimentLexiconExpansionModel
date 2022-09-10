@@ -5,19 +5,16 @@ import numpy as np
 import pandas as pd
 
 
-# def parse(path):
-#     g = gzip.open(path, 'rb')
-#     for l in g:
-#         yield json.loads(l)
-
-
 def getAmazonDF(path, filter_year=True):
+    """
+    Function used to read the Amazon review dataset.
+        :param path: path to the .gz file
+        :param filter_year: True if you want to select the time period May 1996-July 2014.
+        Otherwise, the time period is May 1996-October 2018
+        :return: dataframe containing [ReviewText,Label]
+    """
     print(f"📖 Reading review dataset [{path}, {filter_year}]...")
     review_dict = {}
-    # i = 0
-    # for d in parse(path):
-    #     review_dict[i] = d
-    #     i += 1
 
     for i, line in enumerate(gzip.open(path, 'rb')):
         review = json.loads(line)
@@ -29,10 +26,6 @@ def getAmazonDF(path, filter_year=True):
                 review_dict[i] = {'overall': review['overall'], 'reviewText': review['reviewText']}
 
     df = pd.DataFrame.from_dict(review_dict, orient='index')
-    # df = df[df['unixReviewTime'] < 1406851200]  # remove the reviews
-    # df = df.drop(
-    #     columns=["verified", "reviewTime", "reviewerID", "asin", "reviewerName", "summary", "unixReviewTime", "vote",
-    #              "style", "image"])
     df = df[df["overall"] != 3]
     df['overall'] = df.apply(lambda row: (row["overall"] > 3) * 2 - 1, axis=1)
     df = df.fillna("")
@@ -40,6 +33,11 @@ def getAmazonDF(path, filter_year=True):
 
 
 def getIMDBDF(path="IMDB Dataset.csv"):
+    """
+    Function used to read the IMDb dataset.
+        :param path: path to the .csv file
+        :return: dataframe containing [Text,Label]
+    """
     print(f"\n📖 Reading IMDb review dataset...")
     df = pd.read_csv(path)
     df.rename(columns={"review": "text", "sentiment": "label"}, inplace=True)
@@ -49,6 +47,11 @@ def getIMDBDF(path="IMDB Dataset.csv"):
 
 
 def getHotelReviewDF(path="Hotel_Reviews.csv"):
+    """
+    Function used to read the Hotel review dataset.
+        :param path: path to the .csv file
+        :return: dataframe containing [Text,Label]
+    """
     print(f"\n📖 Reading Hotel review dataset...")
     df = pd.read_csv(path)[["Negative_Review", "Positive_Review", "Reviewer_Score"]]
     df.loc[:, 'Positive_Review'] = df.Positive_Review.apply(lambda x: x.replace('No Positive', ''))
@@ -60,6 +63,11 @@ def getHotelReviewDF(path="Hotel_Reviews.csv"):
 
 
 def getCoronaDF(path="Corona_NLP_train.csv"):
+    """
+    Function used to read the Coronavirus tweet dataset.
+        :param path: path to the .csv file
+        :return: dataframe containing [Text,Label]
+    """
     print(f"\n📖 Reading Corona tweet dataset...")
     df = pd.read_csv(path, encoding="ISO-8859-1")[["OriginalTweet", "Sentiment"]]
 
@@ -74,6 +82,11 @@ def getCoronaDF(path="Corona_NLP_train.csv"):
 
 
 def getSpamDF(path="SPAM text message 20170820 - Data.csv"):
+    """
+    Function used to read the Spam messages dataset.
+        :param path: path to the .csv file
+        :return: dataframe containing [Text,Label]
+    """
     print(f"\n📖 Reading SPAM text message dataset...")
     df = pd.read_csv(path)
 
@@ -86,6 +99,12 @@ def getSpamDF(path="SPAM text message 20170820 - Data.csv"):
 
 
 def getFakeNewsDF(true_news_path="True.csv", fake_news_path="Fake.csv"):
+    """
+    Function used to read the Fake news dataset.
+        :param true_news_path: path to True.csv file
+        :param fake_news_path: path to False.csv file
+        :return: dataframe containing [Text,Label]
+    """
     print(f"\n📖 Reading fake news dataset...")
     truedf = pd.read_csv(true_news_path)
     fakedf = pd.read_csv(fake_news_path)
@@ -100,6 +119,10 @@ def getFakeNewsDF(true_news_path="True.csv", fake_news_path="Fake.csv"):
 
 
 def read_vader():
+    """
+    Function used to read the VADER lexicon
+        :return: dictonary containg {word: sentiment_score}
+    """
     print('\nIndexing VADER word vectors.')
 
     vader = {}
@@ -117,6 +140,10 @@ def read_vader():
 
 
 def read_glove():
+    """
+    Function used to read the GloVe CommonCrawl embeddings.
+        :return: dictonary containg {word: embeddings}
+    """
     print('Indexing GLOVE word vectors.')
 
     embeddings_index = {}
@@ -133,7 +160,13 @@ def read_glove():
     return embeddings_index
 
 
-def dataPreparation(dataset, glove):
+def data_preparation(dataset, embeddings):
+    """
+    Function used to prepare data for training in the domain specific expertiment.
+        :param dataset: dictionary containing {word: sentiment_score}
+        :param embeddings: embeddigs dictionary containing {word: embeddings}
+        :return: token list, embeddings list, polarities list, bucket list
+    """
     tokens = []
     embeds = []
     polarities = []
@@ -142,7 +175,7 @@ def dataPreparation(dataset, glove):
     for tok in dataset.keys():
         try:
             polarity = dataset[tok]
-            embed = glove[tok]
+            embed = embeddings[tok]
             tokens.append(tok)
             embeds.append(np.array(embed))
             polarities.append(polarity)

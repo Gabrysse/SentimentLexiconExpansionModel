@@ -47,7 +47,7 @@ class Net(nn.Module):
         x = self.fc4(x)
         x = self.fc5(x)
 
-        x = x * (self.scale_max-self.scale_min) + self.scale_min
+        x = x * (self.scale_max - self.scale_min) + self.scale_min
         x = x.squeeze(dim=1)
 
         return x

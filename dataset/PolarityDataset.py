@@ -3,14 +3,19 @@ from torch.utils.data import Dataset
 
 
 class PolarityDataset(Dataset):
+    """
+    Polarity dataset class used during training
+    """
     def __init__(self, embeds, polarities):
+        """
+            :param embeds: Embeddings vector
+            :param polarities: Polarities vector
+        """
         self.embeds = embeds
         self.polarities = polarities
-        # self.input_val = list(input.values())
 
     def __len__(self):
         return len(self.embeds)
-        # return len(self.input_val)
 
     def __getitem__(self, idx):
         embed = self.embeds[idx]

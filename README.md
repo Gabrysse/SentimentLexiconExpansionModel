@@ -53,7 +53,7 @@ At the end of the training you can find the checkpoint of the model in the root 
 ### Unsupervised sentiment classification
 
 ```bash
-python test.py --checkpoint1="net2_Automotive_True.pth" --checkpoint2="net2_Automotive_False.pth" --unsup_dataset="imdb" --word_ranking
+python unsupervised_sentiment.py --checkpoint1="net2_Automotive_True.pth" --checkpoint2="net2_Automotive_False.pth" --unsup_dataset="imdb" --word_ranking
 
 ```
 

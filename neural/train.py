@@ -38,7 +38,6 @@ def train(model, train_dataloader, eval_dataloader, epoch_num=100, batch_size=32
 
     for epoch in range(epoch_num):
         model.train()
-        running_loss = 0.0
         lr = get_lr(optimizer)
 
         tq = tqdm.tqdm(total=len(train_dataloader) * batch_size)
@@ -49,8 +48,7 @@ def train(model, train_dataloader, eval_dataloader, epoch_num=100, batch_size=32
             inputs, labels = data
             labels = labels.reshape(-1, 1)
             prediction = model(inputs)
-            # print(prediction.size())
-            # print(labels.size())
+
             loss = criterion(prediction, labels)
 
             tq.update(batch_size)
@@ -58,8 +56,6 @@ def train(model, train_dataloader, eval_dataloader, epoch_num=100, batch_size=32
 
             loss.backward()
             optimizer.step()
-
-            running_loss += loss.item()
 
         tq.close()
         val_loss = val(model, eval_dataloader, criterion)
@@ -71,5 +67,4 @@ def train(model, train_dataloader, eval_dataloader, epoch_num=100, batch_size=32
             print("Early stopping")
             break
 
-    # model.load_state_dict(torch.load('checkpoint.pt'))
     print('Finished Training')
