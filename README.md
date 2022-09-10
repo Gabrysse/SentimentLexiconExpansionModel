@@ -2,7 +2,7 @@
 
 University project made for _Deep natural language processing_ course of A.Y. 2021/2022 of Master degree in "Data science and engineering @ Politecnico di Torino".
 
-We reproduce the experiment presented in the paper _"Domain-Specific Sentiment Lexicons Induced from Labeled Documents"_ ([link](https://aclanthology.org/2020.coling-main.578/)) and we perform some additional analysis described in the [report]().
+We reproduce the experiment presented in the paper _"Domain-Specific Sentiment Lexicons Induced from Labeled Documents"_ ([link](https://aclanthology.org/2020.coling-main.578/)) and we perform some additional analysis described in the [report](https://github.com/Gabrysse/SentimentLexiconExpansionModel/blob/master/SentimentLexiconExpansionModel.pdf).
 
 
 ## Requirements
